@@ -1,0 +1,63 @@
+@startuml
+left to right direction
+actor "Spielersteller" as GameCreator
+actor "Spielleiter" as GameMaster
+actor "Spieler" as Player
+database "Speichermedium" as Storage
+
+rectangle "System\nKonfiguration" {
+(Konfiguration erstellen)   as UC_CreateConfig
+(Parameter festlegen)       as UC_SetParameters
+(Kategorien anlegen)        as UC_DefineCategories
+(Anzahl Schwierigkeitsstufen definieren) as UC_SetDifficultyLevels
+(Fragentyp festlegen)       as UC_SetQuestionType
+(Fragen hinzufügen)         as UC_AddQuestions
+(aus Datenbank laden)       as UC_LoadFromDatabase
+(KI fragen)                 as UC_AskAI
+(Konfiguration speichern)   as UC_SaveConfig
+(Konfiguration exportieren) as UC_ExportConfig
+
+'Beziehungen GameCreator'
+GameCreator -- UC_CreateConfig
+GameCreator -- UC_SetParameters
+GameCreator -- UC_AddQuestions
+GameCreator -- UC_SaveConfig
+
+'Beziehungen <<include>>'
+UC_SetParameters ..> UC_DefineCategories : <<include>>
+UC_SetParameters ..> UC_SetDifficultyLevels : <<include>>
+UC_SetParameters ..> UC_SetQuestionType : <<include>>
+
+'Beziehungen <<extend>>
+UC_AddQuestions ..> UC_LoadFromDatabase : <<extend>>
+UC_AddQuestions ..> UC_AskAI : <<extend>>
+UC_SaveConfig <.. UC_ExportConfig : <<extend>>
+}
+
+rectangle "System\nSpiel" {
+(Spielparameter festlegen)  as UC_SetGameParameters
+(Teams anlegen)             as UC_CreateTeams
+(Konfiguration laden)       as UC_LoadConfig
+(Spiel starten)             as UC_StartGame
+(Spielzug durchführen)      as UC_MakeMove
+(Frage anzeigen)            as UC_DisplayQuestion
+(Antwort auswählen)         as UC_SelectAnswer
+(Punkte vergeben)           as UC_AwardPoints
+
+'Beziehungen
+GameMaster -- UC_SetGameParameters
+GameMaster -- UC_StartGame
+Player -- UC_MakeMove
+
+'Beziehungen <<include>>
+UC_SetGameParameters ..> UC_CreateTeams : <<include>>
+UC_SetGameParameters ..> UC_LoadConfig : <<include>>
+UC_MakeMove ..> UC_DisplayQuestion : <<include>>
+UC_MakeMove ..> UC_SelectAnswer : <<include>>
+UC_SelectAnswer .> UC_AwardPoints : <<include>>
+}
+
+UC_LoadConfig -- Storage
+UC_ExportConfig -- Storage
+
+@enduml
