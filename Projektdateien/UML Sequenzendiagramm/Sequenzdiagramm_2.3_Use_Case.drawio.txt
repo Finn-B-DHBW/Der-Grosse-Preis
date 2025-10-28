@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-10-28T00:00:00.000Z" agent="GPT-5 UML Generator" version="24.8.1" type="device">
+  <diagram id="UMLSequenceDiagram" name="Use Case 2.3 – Game Preparation and Start">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Lifelines -->
+        <mxCell id="Host" value="Host" style="shape=umlLifeline;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="50" width="100" height="700" as="geometry"/>
+        </mxCell>
+        <mxCell id="System" value="System" style="shape=umlLifeline;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="50" width="100" height="700" as="geometry"/>
+        </mxCell>
+        <mxCell id="Player" value="Player" style="shape=umlLifeline;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="50" width="100" height="700" as="geometry"/>
+        </mxCell>
+
+        <!-- Messages -->
+        <mxCell id="m1" value="DefineGameParameters(name, NumberOfRounds, TimeLimit)" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="Host" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m2" value="SaveGameParameters()" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;html=1;rounded=0;" edge="1" source="System" target="Host" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m3" value="LoadConfiguration" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="Player" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m4" value="ParametersSaved" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;html=1;rounded=0;" edge="1" source="Player" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m5" value="LoadConfiguration(ConfigID)" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="Host" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m6" value="RetrieveConfiguration(ConfigID)" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m7" value="Return Configuration" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;html=1;rounded=0;" edge="1" source="System" target="Host" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m8" value="CreateTeam(TeamName)" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="Player" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m9" value="RegistrationButton" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;html=1;rounded=0;" edge="1" source="System" target="Player" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m10" value="JoinTeam(TeamCode)" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="Player" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m11" value="RegistrationConfirmed" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;html=1;rounded=0;" edge="1" source="System" target="Player" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m12" value="PlayerJoinedNotification" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="Host" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m13" value="StartGame()" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="Host" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m14" value="UpdateGameStatus('Started')" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m15" value="OK" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;html=1;rounded=0;" edge="1" source="System" target="Host" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m16" value="GameModeActivated" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="Player" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m17" value="GameStartNotification" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="Player" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m18" value="InitializeGameRound()" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;rounded=0;" edge="1" source="System" target="System" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
