@@ -60,6 +60,8 @@ Die Spielersteller konfigurieren das Spiel, legen Fragen und Parameter fest, wä
 **Beschreibung:**  
 Dieser Use Case umfasst alle Aktivitäten, die notwendig sind, um eine neue Spielkonfiguration anzulegen, Parameter festzulegen (Kategorien, Schwierigkeitsgrade, Fragetypen), Fragen hinzuzufügen, und die Konfiguration zu speichern oder zu exportieren. Erweiterte Funktionen wie Fragen aus einer Datenbank laden oder per KI generieren sind optionale Erweiterungen.
 
+![UML-Aktivitätsdiagramm](https://github.com/Finn-B-DHBW/Der-Grosse-Preis/raw/6a39dbcd260a13a8efae93bbc7ec5bf37c2f173c/Projektdateien/UML%20Diagramme/Aktivit%C3%A4tsdiagramm%20Kategorie%20erstellen.jpg)
+
 **User Stories:**  
 
 - Als Spielersteller möchte ich eine neue Spielkonfiguration anlegen, um das Spiel individuell anzupassen.  
@@ -80,6 +82,8 @@ Dieser Use Case umfasst alle Aktivitäten, die notwendig sind, um eine neue Spie
 #### 2.3 Spielvorbereitung und Spielstart
 **Beschreibung:**  
 Der Spielleiter legt die Spielparameter fest und lädt eine bestehende Konfiguration. Entweder erstellt er die Teams oder jedes Team nimmt am Spiel über ein Smartphone teil. Anschließend wird das Spiel gestartet.
+
+![UML-Sequenzdiagramm](https://github.com/Finn-B-DHBW/Der-Grosse-Preis/blob/6a39dbcd260a13a8efae93bbc7ec5bf37c2f173c/Projektdateien/UML%20Sequenzendiagramm/Sequenzendiagramm_Use_Case_2.3.jpeg)
 
 **User Stories:**  
 - Als Spielleiter möchte ich Teams erstellen, damit Spieler zusammen spielen können.  
@@ -104,6 +108,8 @@ Der Spielleiter legt die Spielparameter fest und lädt eine bestehende Konfigura
 
 **Beschreibung:**  
 Das System zeigt Fragen an, Spieler wählen Antworten aus. Der Spielleiter oder das System vergibt Punkte und steuert den Spielverlauf.
+
+![UML-Aktivitätsdiagramm](https://github.com/Finn-B-DHBW/Der-Grosse-Preis/raw/6a39dbcd260a13a8efae93bbc7ec5bf37c2f173c/Projektdateien/UML-Aktivitaetdiagramm/Aktivitaetdiagramm_Frage.jpg)
 
 **User Stories:**  
 - Als Nutzer (aktiver Spieler) möchte ich eine Übersicht mit allen Kategorien und Schwierigkeitsstufen sehen, damit ich mir überlegen kann, welche Frage ich auswählen möchte. ([Jira DGP-18](https://dhbw-se.atlassian.net/browse/DGP-18))  
