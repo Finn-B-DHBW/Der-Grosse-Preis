@@ -62,6 +62,10 @@ Dieser Use Case umfasst alle Aktivitäten, die notwendig sind, um eine neue Spie
 
 ![UML-Aktivitätsdiagramm](https://github.com/Finn-B-DHBW/Der-Grosse-Preis/raw/6a39dbcd260a13a8efae93bbc7ec5bf37c2f173c/Projektdateien/UML%20Diagramme/Aktivit%C3%A4tsdiagramm%20Kategorie%20erstellen.jpg)
 
+![UML-Aktivitäsdiagramm](https://github.com/Finn-B-DHBW/Der-Grosse-Preis/raw/12812cdfacce513972e8b54168a4c5ade3ca327a/Projektdateien/UML%20Diagramme/Aktivit%C3%A4tsdiagramm%20Spielkonfigurationen%20verwalten.png)
+
+![Sequenzdiagramm](https://github.com/Finn-B-DHBW/Der-Grosse-Preis/raw/12812cdfacce513972e8b54168a4c5ade3ca327a/Projektdateien/UML%20Sequenzendiagramm/SequenzDiagramm_Denis.png)
+
 **User Stories:**  
 
 - Als Spielersteller möchte ich eine neue Spielkonfiguration anlegen, um das Spiel individuell anzupassen.  
