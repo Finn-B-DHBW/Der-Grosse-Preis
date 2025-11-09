@@ -1,5 +1,3 @@
-package dhbw.dgp;
-
 import java.util.List;
 
 public class Player {

@@ -1,5 +1,3 @@
-package dhbw.dgp;
-
 public class Question {
     private final String questionText;
     private final String categorie;
