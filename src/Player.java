@@ -21,7 +21,7 @@ public class Player {
         return score;
     }
 
-    public void addRightAnswerToList(Question rightAnswers) {
+    public void addRightAnswerToList(Question rightAnswers, String name) {
         this.rightAnswers.add(rightAnswers);
         this.score += rightAnswers.getScore();
     }

@@ -68,4 +68,9 @@ public class GameManager extends JFrame {
     public void addPlayer(String name) {
         this.players.add(new Player(name));
     }
+
+    public void answerQuestion(Question question, String name){
+        //todo check if question is right or wrong
+    }
+
 }
