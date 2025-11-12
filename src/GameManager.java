@@ -53,12 +53,55 @@ public class GameManager extends JFrame {
         cleanScreen();
         JPanel panelMain = new JPanel();
         panelMain.setBackground(Color.GREEN);
+        panelMain.setLayout(new BoxLayout(panelMain, BoxLayout.Y_AXIS));
+
+        //Top Panel
+        JLabel title = new JLabel("DER GROSSE PREIS");
+        title.setFont(new Font("Arial", Font.BOLD, 60));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelMain.add(title);
+
+        //Center Panel
+        JPanel centerPanelMain = new JPanel(new GridLayout(6, 5));
+        for (int i = 1; i < 6; i++) {
+            centerPanelMain.add(new JButton("Theme "+i));
+        }
+        for (int i = 1; i < 6; i++) {
+            for (int j = 1; j < 6; j++) {
+                JButton button = new JButton(i*10+"Points");
+//                button.addActionListener(e -> showQuestionScreen()); just for testing
+                centerPanelMain.add(button);
+            }
+        }
+        panelMain.add(centerPanelMain);
+
+        //Bottom Panel
+        JPanel bottomPanelMain = new JPanel(new GridLayout(0,2));
+        bottomPanelMain.add(new JLabel("Player x turn"));
+
+        //Testing JTable
+        System.out.println((int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2));
+        int x = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/4);
+        bottomPanelMain.setPreferredSize(new Dimension(Integer.MAX_VALUE, x));
+        bottomPanelMain.setMaximumSize(new Dimension(Integer.MAX_VALUE, x));
+        String[] columnHeader = {"Player", "Points"};
+        Object[][] data = {
+                {"Player 1", 2},
+                {"Player 2", 3},
+                {"Player 3", 1}
+        };
+        JTable currentRanking = new JTable(data, columnHeader);
+        JScrollPane scrollPane = new JScrollPane(currentRanking);
+        bottomPanelMain.add(scrollPane);
+        panelMain.add(bottomPanelMain);
+
         this.add(panelMain);
         this.setVisible(true);
     }
 
     public void showQuestionScreen(){
         //Screen that will display the selected question and the different answer possibilities
+        cleanScreen();
     }
 
     public void showEndScreen(){
