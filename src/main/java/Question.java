@@ -1,24 +1,36 @@
 public class Question {
+
     private final String questionText;
-    private final String categorie;
+    private final String category;
     private final String rightAnswer;
     private String[] wrongAnswers = new String[3];
     private final int score;
 
-    public Question(String questionText, String categorie, String rightAnswer, String[] wrongAnswers, int score) {
+    public Question(String questionText, String category, String rightAnswer, int score) {
         this.questionText = questionText;
-        this.categorie = categorie;
+        this.category = category;
+        this.rightAnswer = rightAnswer;
+        this.score = score;
+    }
+
+    public Question(String questionText, String category, String rightAnswer, String[] wrongAnswers, int score) {
+        this.questionText = questionText;
+        this.category = category;
         this.rightAnswer = rightAnswer;
         this.wrongAnswers = wrongAnswers;
         this.score = score;
+    }
+
+    public void setWrongAnswers(String[] wrongAnswers) {
+        this.wrongAnswers = wrongAnswers;
     }
 
     public String getQuestionText() {
         return questionText;
     }
 
-    public String getCategorie() {
-        return categorie;
+    public String getCategory() {
+        return category;
     }
 
     public String getRightAnswer() {
