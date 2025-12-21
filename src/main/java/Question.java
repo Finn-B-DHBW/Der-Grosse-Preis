@@ -5,20 +5,19 @@ public class Question {
     private final String rightAnswer;
     private String[] wrongAnswers = new String[3];
     private final int score;
+    private final int questionId;
 
-    public Question(String questionText, String category, String rightAnswer, int score) {
-        this.questionText = questionText;
-        this.category = category;
-        this.rightAnswer = rightAnswer;
-        this.score = score;
+    public Question(String questionText, String category, String rightAnswer, int score, int questionId) {
+        this(questionText, category, rightAnswer, null, score, questionId);
     }
 
-    public Question(String questionText, String category, String rightAnswer, String[] wrongAnswers, int score) {
+    public Question(String questionText, String category, String rightAnswer, String[] wrongAnswers, int score, int questionId) {
         this.questionText = questionText;
         this.category = category;
         this.rightAnswer = rightAnswer;
         this.wrongAnswers = wrongAnswers;
         this.score = score;
+        this.questionId = questionId;
     }
 
     public void setWrongAnswers(String[] wrongAnswers) {
@@ -43,5 +42,9 @@ public class Question {
 
     public int getScore() {
         return score;
+    }
+
+    public int getQuestionId() {
+        return questionId;
     }
 }

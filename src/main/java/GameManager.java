@@ -10,7 +10,7 @@ public class GameManager extends JFrame {
 
     public GameManager() {
         this.serverSocket = new SocketServer(this);
-        this.db = new DataBase(this);
+        this.db = new DataBase();
 
         this.setResizable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);

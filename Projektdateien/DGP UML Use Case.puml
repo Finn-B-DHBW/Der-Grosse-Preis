@@ -2,7 +2,7 @@
 left to right direction
 actor "Spielersteller" as GameCreator
 actor "Spielleiter" as GameMaster
-actor "Spieler" as Player
+actor "Spieler" as main.java.Player
 database "Speichermedium" as Storage
 
 rectangle "System\nKonfiguration" {
@@ -47,7 +47,7 @@ rectangle "System\nSpiel" {
 'Beziehungen
 GameMaster -- UC_SetGameParameters
 GameMaster -- UC_StartGame
-Player -- UC_MakeMove
+main.java.Player -- UC_MakeMove
 
 'Beziehungen <<include>>
 UC_SetGameParameters ..> UC_CreateTeams : <<include>>
