@@ -62,7 +62,7 @@ public class SocketServer implements Runnable{
 
                 //todo hier noch einiges zu machen das es funktioniert vorallem so das polling funktioniert
                 // hab gerade nur die basic functionallity gemacht sodas gui methoden theorethisch drauf
-                // aufbauen können. Kann auch sein das man die Question klasse erweitern muss auf eine
+                // aufbauen können. Kann auch sein das man die main.java.Question klasse erweitern muss auf eine
                 // antwort oder man macht noch eine klasse answer und dann sagt man der server schickt die fragen clients antworten
                 //aber das ist noch nicht relevant weshalb ich es noch nicht fertig implementiere
             } catch (IOException | ClassNotFoundException e) {
