@@ -1,9 +1,11 @@
+import java.util.Arrays;
+
 public class Question {
 
     private final String questionText;
     private final String category;
     private final String rightAnswer;
-    private String[] wrongAnswers = new String[3];
+    private String[] wrongAnswers;
     private final int score;
     private final int questionId;
 
@@ -46,5 +48,17 @@ public class Question {
 
     public int getQuestionId() {
         return questionId;
+    }
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "questionText='" + questionText + '\'' +
+                ", category='" + category + '\'' +
+                ", rightAnswer='" + rightAnswer + '\'' +
+                ", wrongAnswers=" + Arrays.toString(wrongAnswers) +
+                ", score=" + score +
+                ", questionId=" + questionId +
+                '}';
     }
 }
