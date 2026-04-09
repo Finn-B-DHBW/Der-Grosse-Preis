@@ -1,9 +1,7 @@
 name: Maven Compile Test
 
 on:
-  push: 
-    branches:
-      - SqlLiteTest
+  push:
 
 jobs:
   build:
