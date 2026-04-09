@@ -39,10 +39,38 @@ public class GameManager extends JFrame {
 
         //panelJoin.add(QR Code, BorderLayout.EAST);
 
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.setBackground(Color.CYAN);
+
         JButton startButton = new JButton("Start Game");
-        startButton.setPreferredSize(new Dimension(500, 100));
+        startButton.setPreferredSize(new Dimension(300, 80));
         startButton.addActionListener(e -> showMainScreen());
-        panelJoin.add(startButton, BorderLayout.SOUTH);
+        buttonPanel.add(startButton);
+
+        JButton configButton = new JButton("Neue Konfiguration erstellen");
+        configButton.setPreferredSize(new Dimension(300, 80));
+        configButton.addActionListener(e -> {
+            new MainController();
+        });
+        buttonPanel.add(configButton);
+
+        JButton loadButton = new JButton("Spiel laden");
+        loadButton.setPreferredSize(new Dimension(300, 80));
+        loadButton.addActionListener(e -> {
+            // Load saved configurations and go to main screen
+            List<Configuration> configs = DatabaseConnector.loadConfigurations();
+            if (!configs.isEmpty()) {
+                Configuration config = configs.get(0);
+                showMainScreen();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Keine gespeicherten Konfigurationen gefunden.",
+                    "Spiel laden", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        buttonPanel.add(loadButton);
+
+        panelJoin.add(buttonPanel, BorderLayout.SOUTH);
 
         this.add(panelJoin);
         this.setVisible(true);
