@@ -10,7 +10,7 @@ public class GameManager extends JFrame {
 
     public GameManager() {
         this.serverSocket = new SocketServer(this);
-        this.db = new DataBase();
+        this.db = new DataBase(this);
 
         this.setResizable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -77,18 +77,18 @@ public class GameManager extends JFrame {
 
         //Bottom Panel
         JPanel bottomPanelMain = new JPanel(new GridLayout(0,2));
-        bottomPanelMain.add(new JLabel("main.java.Player x turn"));
+        bottomPanelMain.add(new JLabel("Player x turn"));
 
         //Testing JTable
         System.out.println((int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2));
         int x = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/4);
         bottomPanelMain.setPreferredSize(new Dimension(Integer.MAX_VALUE, x));
         bottomPanelMain.setMaximumSize(new Dimension(Integer.MAX_VALUE, x));
-        String[] columnHeader = {"main.java.Player", "Points"};
+        String[] columnHeader = {"Player", "Points"};
         Object[][] data = {
-                {"main.java.Player 1", 2},
-                {"main.java.Player 2", 3},
-                {"main.java.Player 3", 1}
+                {"Player 1", 2},
+                {"Player 2", 3},
+                {"Player 3", 1}
         };
         JTable currentRanking = new JTable(data, columnHeader);
         JScrollPane scrollPane = new JScrollPane(currentRanking);
