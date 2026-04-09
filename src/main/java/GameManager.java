@@ -1,3 +1,12 @@
+import config.DatabaseConnector;
+import config.model.Category;
+import config.model.ConfigQuestion;
+import config.model.Configuration;
+import config.model.Team;
+import config.ui.MainController;
+import game.GameLogic;
+import game.PointsManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -95,7 +104,6 @@ public class GameManager extends JFrame {
         Configuration config = gameLogic.getConfiguration();
         if (config != null && !config.getCategories().isEmpty()) {
             List<Category> categories = config.getCategories();
-            // Determine the max number of point levels across all categories
             int maxPoints = 0;
             for (Category cat : categories) {
                 maxPoints = Math.max(maxPoints, cat.getPointQuestionMap().size());
@@ -103,14 +111,12 @@ public class GameManager extends JFrame {
 
             JPanel centerPanelMain = new JPanel(new GridLayout(maxPoints + 1, categories.size()));
 
-            // Header row: category names
             for (Category cat : categories) {
                 JButton catButton = new JButton(cat.getName());
                 catButton.setEnabled(false);
                 centerPanelMain.add(catButton);
             }
 
-            // Question rows
             for (int row = 0; row < maxPoints; row++) {
                 int pointValue = (row + 1) * 10;
                 for (Category cat : categories) {
@@ -146,7 +152,6 @@ public class GameManager extends JFrame {
         //Bottom Panel — scoreboard from GameLogic or fallback
         JPanel bottomPanelMain = new JPanel(new GridLayout(0, 2));
 
-        // Turn indicator
         String turnText = "Player x turn";
         if (!gameLogic.getTeams().isEmpty()) {
             turnText = gameLogic.getCurrentTeam().getName() + " ist dran";

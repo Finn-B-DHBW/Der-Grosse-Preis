@@ -1,3 +1,9 @@
+package config.builder;
+
+import config.model.Category;
+import config.model.ConfigQuestion;
+import config.model.Configuration;
+
 import java.util.Map;
 import java.util.TreeMap;
 

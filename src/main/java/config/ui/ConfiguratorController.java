@@ -1,3 +1,7 @@
+package config.ui;
+
+import config.ConfiguratorOverview;
+
 import javax.swing.*;
 
 public class ConfiguratorController

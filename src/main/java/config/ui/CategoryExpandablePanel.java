@@ -1,3 +1,8 @@
+package config.ui;
+
+import config.model.Category;
+import config.model.ConfigQuestion;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;

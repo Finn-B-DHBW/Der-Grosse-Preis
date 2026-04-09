@@ -1,3 +1,9 @@
+package game;
+
+import config.model.Category;
+import config.model.Configuration;
+import config.model.Team;
+
 import java.util.ArrayList;
 import java.util.List;
 

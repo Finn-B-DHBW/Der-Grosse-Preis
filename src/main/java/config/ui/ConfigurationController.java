@@ -1,3 +1,9 @@
+package config.ui;
+
+import config.ConfiguratorOverview;
+import config.model.Category;
+import config.model.Configuration;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

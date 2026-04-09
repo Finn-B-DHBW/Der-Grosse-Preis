@@ -1,3 +1,9 @@
+package config.ui;
+
+import config.ConfiguratorOverview;
+import config.model.Category;
+import config.model.ConfigQuestion;
+
 import javax.swing.*;
 import java.awt.Dimension;
 import java.util.ArrayList;

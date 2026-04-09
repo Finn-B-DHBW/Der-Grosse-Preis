@@ -1,3 +1,7 @@
+package game;
+
+import config.model.Team;
+
 import java.util.HashMap;
 import java.util.Map;
 

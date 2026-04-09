@@ -1,3 +1,8 @@
+package config;
+
+import config.model.Category;
+import config.model.ConfigQuestion;
+
 public class QuestionEditor {
     private ConfigQuestion currentQuestionInEditing;
 

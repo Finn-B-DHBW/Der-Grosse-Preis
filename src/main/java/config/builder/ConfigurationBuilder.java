@@ -1,10 +1,13 @@
+package config.builder;
+
+import config.model.Configuration;
+
 public class ConfigurationBuilder {
     private Configuration configuration;
     private CategoryBuilder categoryBuilder;
 
     public static ConfigurationBuilder createConfiguration() {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        return configurationBuilder;
+        return new ConfigurationBuilder();
     }
 
     private ConfigurationBuilder() {

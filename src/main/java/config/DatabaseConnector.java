@@ -1,3 +1,9 @@
+package config;
+
+import config.model.Category;
+import config.model.ConfigQuestion;
+import config.model.Configuration;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,3 +1,5 @@
+package config.model;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,11 +17,9 @@ public class ConfigQuestion {
         this.numberOfAnswers = (count != null) ? count : 3;
         this.answers = new ArrayList<>(numberOfAnswers);
 
-        // Initialize the list with empty strings
         for (int i = 0; i < numberOfAnswers; i++) {
             answers.add("");
         }
-        // default: no correct answer selected
         this.correctAnswer = 0;
     }
 
@@ -41,17 +41,10 @@ public class ConfigQuestion {
         return Collections.unmodifiableList(this.answers);
     }
 
-    /**
-     * Returns the correct answer index in 1..3; 0 means none selected.
-     */
     public int getCorrectAnswer() {
         return correctAnswer;
     }
 
-    /**
-     * Sets the correct answer index. Allowed values: 0 (none), 1, 2, 3.
-     * Values outside this range will be ignored.
-     */
     public void setCorrectAnswer(int correctAnswer) {
         if (correctAnswer >= 0 && correctAnswer <= 3) {
             this.correctAnswer = correctAnswer;

@@ -1,3 +1,7 @@
+package config.ui;
+
+import config.model.ConfigQuestion;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;

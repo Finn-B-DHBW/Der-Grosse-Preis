@@ -1,3 +1,8 @@
+package game;
+
+import config.model.Category;
+import config.model.ConfigQuestion;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

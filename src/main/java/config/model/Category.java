@@ -1,3 +1,5 @@
+package config.model;
+
 import java.util.Map;
 
 public class Category {

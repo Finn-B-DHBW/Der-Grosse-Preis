@@ -1,4 +1,6 @@
-import javax.swing.*;
+package config.ui;
+
+import config.ConfiguratorOverview;
 import com.formdev.flatlaf.FlatLightLaf;
 
 public class MainController {
