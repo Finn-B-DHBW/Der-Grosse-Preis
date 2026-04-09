@@ -95,10 +95,28 @@ public class GameManager extends JFrame {
         panelMain.setLayout(new BoxLayout(panelMain, BoxLayout.Y_AXIS));
 
         //Top Panel
+        JPanel panelHeader = new JPanel(new BorderLayout());
+        panelHeader.setBackground(Color.GREEN);
+        panelHeader.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+
+        JButton backButton = new JButton("Zurück");
+        backButton.setPreferredSize(new Dimension(150, 40));
+        backButton.addActionListener(e -> {
+            cleanScreen();
+            showJoinScreen();
+        });
+        JPanel backPanel = new JPanel();
+        backPanel.add(backButton);
+        backPanel.setBackground(Color.GREEN);
+        panelHeader.add(backPanel, BorderLayout.WEST);
+
         JLabel title = new JLabel("DER GROSSE PREIS");
         title.setFont(new Font("Arial", Font.BOLD, 60));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelMain.add(title);
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        panelHeader.add(title, BorderLayout.CENTER);
+
+        panelMain.add(panelHeader);
+
 
         //Center Panel — build grid from loaded configuration or fallback to defaults
         Configuration config = gameLogic.getConfiguration();
@@ -185,17 +203,6 @@ public class GameManager extends JFrame {
         JScrollPane scrollPane = new JScrollPane(currentRanking);
         bottomPanelMain.add(scrollPane);
         panelMain.add(bottomPanelMain);
-
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        footerPanel.setBackground(Color.GREEN);
-        JButton backButton = new JButton("Zurück");
-        backButton.setPreferredSize(new Dimension(150, 40));
-        backButton.addActionListener(e -> {
-            cleanScreen();
-            showJoinScreen();
-        });
-        footerPanel.add(backButton);
-        panelMain.add(footerPanel);
 
         this.add(panelMain);
         this.setVisible(true);
