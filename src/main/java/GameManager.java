@@ -1,16 +1,19 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 
 public class GameManager extends JFrame {
     private List<Player> players;
     private List<Question> questions;
     private SocketServer serverSocket;
     private DataBase db;
+    private GameLogic gameLogic;
 
     public GameManager() {
         this.serverSocket = new SocketServer(this);
         this.db = new DataBase(this);
+        this.gameLogic = new GameLogic();
 
         this.setResizable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -57,10 +60,10 @@ public class GameManager extends JFrame {
         JButton loadButton = new JButton("Spiel laden");
         loadButton.setPreferredSize(new Dimension(300, 80));
         loadButton.addActionListener(e -> {
-            // Load saved configurations and go to main screen
             List<Configuration> configs = DatabaseConnector.loadConfigurations();
             if (!configs.isEmpty()) {
                 Configuration config = configs.get(0);
+                gameLogic.loadGame(config);
                 showMainScreen();
             } else {
                 JOptionPane.showMessageDialog(this,
@@ -77,7 +80,6 @@ public class GameManager extends JFrame {
     }
 
     public void showMainScreen(){
-        //main.java.Main screen that will display every theme and the different question points
         cleanScreen();
         JPanel panelMain = new JPanel();
         panelMain.setBackground(Color.GREEN);
@@ -89,35 +91,91 @@ public class GameManager extends JFrame {
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         panelMain.add(title);
 
-        //Center Panel
-        JPanel centerPanelMain = new JPanel(new GridLayout(6, 5));
-        for (int i = 1; i < 6; i++) {
-            centerPanelMain.add(new JButton("Theme "+i));
-        }
-        for (int i = 1; i < 6; i++) {
-            for (int j = 1; j < 6; j++) {
-                JButton button = new JButton(i*10+"Points");
-//                button.addActionListener(e -> showQuestionScreen()); just for testing
-                centerPanelMain.add(button);
+        //Center Panel — build grid from loaded configuration or fallback to defaults
+        Configuration config = gameLogic.getConfiguration();
+        if (config != null && !config.getCategories().isEmpty()) {
+            List<Category> categories = config.getCategories();
+            // Determine the max number of point levels across all categories
+            int maxPoints = 0;
+            for (Category cat : categories) {
+                maxPoints = Math.max(maxPoints, cat.getPointQuestionMap().size());
             }
+
+            JPanel centerPanelMain = new JPanel(new GridLayout(maxPoints + 1, categories.size()));
+
+            // Header row: category names
+            for (Category cat : categories) {
+                JButton catButton = new JButton(cat.getName());
+                catButton.setEnabled(false);
+                centerPanelMain.add(catButton);
+            }
+
+            // Question rows
+            for (int row = 0; row < maxPoints; row++) {
+                int pointValue = (row + 1) * 10;
+                for (Category cat : categories) {
+                    ConfigQuestion q = cat.getPointQuestionMap().get(pointValue);
+                    JButton button = new JButton(pointValue + " Punkte");
+                    if (q == null) {
+                        button.setEnabled(false);
+                    } else {
+                        button.addActionListener(e -> {
+                            button.setEnabled(false);
+                            showQuestionScreen();
+                        });
+                    }
+                    centerPanelMain.add(button);
+                }
+            }
+            panelMain.add(centerPanelMain);
+        } else {
+            // Fallback: hardcoded 5x5 grid (original behavior)
+            JPanel centerPanelMain = new JPanel(new GridLayout(6, 5));
+            for (int i = 1; i < 6; i++) {
+                centerPanelMain.add(new JButton("Theme " + i));
+            }
+            for (int i = 1; i < 6; i++) {
+                for (int j = 1; j < 6; j++) {
+                    JButton button = new JButton(i * 10 + " Points");
+                    centerPanelMain.add(button);
+                }
+            }
+            panelMain.add(centerPanelMain);
         }
-        panelMain.add(centerPanelMain);
 
-        //Bottom Panel
-        JPanel bottomPanelMain = new JPanel(new GridLayout(0,2));
-        bottomPanelMain.add(new JLabel("Player x turn"));
+        //Bottom Panel — scoreboard from GameLogic or fallback
+        JPanel bottomPanelMain = new JPanel(new GridLayout(0, 2));
 
-        //Testing JTable
-        System.out.println((int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2));
-        int x = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/4);
+        // Turn indicator
+        String turnText = "Player x turn";
+        if (!gameLogic.getTeams().isEmpty()) {
+            turnText = gameLogic.getCurrentTeam().getName() + " ist dran";
+        }
+        bottomPanelMain.add(new JLabel(turnText));
+
+        int x = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 4);
         bottomPanelMain.setPreferredSize(new Dimension(Integer.MAX_VALUE, x));
         bottomPanelMain.setMaximumSize(new Dimension(Integer.MAX_VALUE, x));
-        String[] columnHeader = {"Player", "Points"};
-        Object[][] data = {
+
+        String[] columnHeader = {"Team", "Punkte"};
+        Object[][] data;
+        PointsManager pm = gameLogic.getPointsManager();
+        Map<Team, Integer> teamPoints = pm.getAllTeamPoints();
+        if (!teamPoints.isEmpty()) {
+            data = new Object[teamPoints.size()][2];
+            int idx = 0;
+            for (Map.Entry<Team, Integer> entry : teamPoints.entrySet()) {
+                data[idx][0] = entry.getKey().getName();
+                data[idx][1] = entry.getValue();
+                idx++;
+            }
+        } else {
+            data = new Object[][]{
                 {"Player 1", 2},
                 {"Player 2", 3},
                 {"Player 3", 1}
-        };
+            };
+        }
         JTable currentRanking = new JTable(data, columnHeader);
         JScrollPane scrollPane = new JScrollPane(currentRanking);
         bottomPanelMain.add(scrollPane);
@@ -144,4 +202,7 @@ public class GameManager extends JFrame {
         //todo check if question is right or wrong
     }
 
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
 }
