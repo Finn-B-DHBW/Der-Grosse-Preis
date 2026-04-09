@@ -186,6 +186,17 @@ public class GameManager extends JFrame {
         bottomPanelMain.add(scrollPane);
         panelMain.add(bottomPanelMain);
 
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        footerPanel.setBackground(Color.GREEN);
+        JButton backButton = new JButton("Zurück");
+        backButton.setPreferredSize(new Dimension(150, 40));
+        backButton.addActionListener(e -> {
+            cleanScreen();
+            showJoinScreen();
+        });
+        footerPanel.add(backButton);
+        panelMain.add(footerPanel);
+
         this.add(panelMain);
         this.setVisible(true);
     }

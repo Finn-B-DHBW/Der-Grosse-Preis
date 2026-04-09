@@ -16,7 +16,7 @@ public class MainView extends JFrame {
         cardPanel = new JPanel(cardLayout);
         panelNames = new HashMap<>();
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
