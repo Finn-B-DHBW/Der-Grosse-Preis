@@ -36,7 +36,10 @@ public class ConfigurationController
     }
 
     private void wireButtonsLazily() {
-        configurationPanel.buttonDone.addActionListener(e -> mainView.showPage(configuratorPanel));
+        configurationPanel.buttonDone.addActionListener(e -> {
+            configuratorOverview.saveConfigurationToDatabase();
+            mainView.showPage(configuratorPanel);
+        });
 
         configurationPanel.textFieldConfigurationTitle.addFocusListener(new FocusAdapter() {
             @Override
