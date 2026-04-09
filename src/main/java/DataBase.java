@@ -7,7 +7,7 @@ public class DataBase {
     private Logger log;
 
     //todo db connection keine prio
-    DataBase() {
+    DataBase(GameManager gameManager) {
         log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
         try {
