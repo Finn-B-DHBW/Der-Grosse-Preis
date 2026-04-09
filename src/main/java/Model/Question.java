@@ -1,3 +1,5 @@
+package Model;
+
 import java.util.Arrays;
 
 public class Question {
@@ -52,7 +54,7 @@ public class Question {
 
     @Override
     public String toString() {
-        return "Question{" +
+        return "Model.Question{" +
                 "questionText='" + questionText + '\'' +
                 ", category='" + category + '\'' +
                 ", rightAnswer='" + rightAnswer + '\'' +

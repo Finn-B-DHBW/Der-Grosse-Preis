@@ -1,3 +1,7 @@
+package Connection;
+
+import Model.Question;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -7,7 +11,7 @@ public class DataBase {
     private Logger log;
 
     //todo db connection keine prio
-    DataBase() {
+    public DataBase() {
         log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
         try {
@@ -55,7 +59,7 @@ public class DataBase {
         String insertQuestion = "INSERT INTO Question(questionText, category, rightAnswer, score) VALUES(?,?,?,?)";
         int questionId = 0;
 
-        //einfügen der Frage in die Question DB; in questionId wird der primaryKey gespeichert für die Wrong answers(1:m beziehung)
+        //einfügen der Frage in die Model.Question DB; in questionId wird der primaryKey gespeichert für die Wrong answers(1:m beziehung)
         try(PreparedStatement preparedStatement = con.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, questionText);

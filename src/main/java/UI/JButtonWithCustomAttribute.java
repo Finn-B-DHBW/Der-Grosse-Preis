@@ -1,3 +1,5 @@
+package UI;
+
 import javax.swing.*;
 
 public class JButtonWithCustomAttribute extends JButton {
