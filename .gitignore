@@ -2,3 +2,5 @@
 /.idea/
 /DeinGrosserPreis/.idea
 /DeinGrosserPreis/target
+/target
+/.claude
