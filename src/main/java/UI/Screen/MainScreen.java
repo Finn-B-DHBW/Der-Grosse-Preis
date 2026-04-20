@@ -24,13 +24,13 @@ public class MainScreen {
         panelMain.add(title);
 
         //Center Panel
-        JPanel centerPanelMain = getJPanel(gm);
+        JPanel centerPanelMain = setUpCenterJPanel(gm);
         panelMain.add(centerPanelMain);
 
         //Bottom Panel
         JPanel bottomPanelMain = new JPanel(new GridLayout(0,2));
-        int playerTurn = 0;
-        bottomPanelMain.add(new JLabel("Player '"+ gm.getPlayers().get(playerTurn).getName() +"' turn"));
+
+        bottomPanelMain.add(new JLabel("Player '"+ gm.getPlayers().get(gm.getCurrentPlayerIndex()).getName() +"' turn"));
 
         //Testing JTable
         System.out.println((int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2));
@@ -53,10 +53,11 @@ public class MainScreen {
         gm.setVisible(true);
     }
 
-    private JPanel getJPanel(GameManager gm) {
+    private JPanel setUpCenterJPanel(GameManager gm) {
         JPanel centerPanelMain = new JPanel(new GridLayout(6, 5, 10, 10));
         centerPanelMain.setBorder(new EmptyBorder(10, 10, 10,10));
         centerPanelMain.setBackground(Color.GREEN);
+
         for (String s : gm.getCategoryList()) {
             JLabel category = new JLabel(s, SwingConstants.CENTER);
             category.setBackground(Color.DARK_GRAY);
@@ -69,14 +70,22 @@ public class MainScreen {
         for (int i = 1; i < 6; i++) {
             questionIdCount = i;
             for (int j = 1; j < 6; j++) {
-//                JButton button = new JButton(i*10+"Points");
                 JButtonWithCustomAttribute button = new JButtonWithCustomAttribute(questionIdCount);
                 button.setText(i*10+" Points");
+                //If a question is selected, show the QuestionScreen with the question
                 button.addActionListener(e -> gm.getQuestionScreen().showQuestionScreen(gm, Objects.requireNonNull(gm.getQuestions().stream()
                         .filter(q -> q.getQuestionId() == button.getQuestionId())
                         .findFirst()
                         .orElse(null)))
                 );
+                //disable the Button for the question that has been already used
+                if(!gm.getAnsweredQuestionList().isEmpty() &&
+                        gm.getAnsweredQuestionList().stream()
+                        .filter(q-> q.getQuestionId() == button.getQuestionId())
+                        .findFirst()
+                        .orElse(null) != null) {
+                    button.setEnabled(false);
+                }
                 centerPanelMain.add(button);
                 questionIdCount+= 5;
             }

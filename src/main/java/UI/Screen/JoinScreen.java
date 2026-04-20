@@ -27,8 +27,10 @@ public class JoinScreen {
         startButton.addActionListener(e -> {
             if (gm.getPlayers().isEmpty()){
                 gm.getPlayers().add(new Player("Test Player"));
+                gm.getPlayers().add(new Player("Test Player number 2"));
             }
             gm.setQuestions();
+            gm.setCurrentPlayerIndex(0);
             gm.getMainScreen().showMainScreen(gm);
         });
         panelJoin.add(startButton, BorderLayout.SOUTH);

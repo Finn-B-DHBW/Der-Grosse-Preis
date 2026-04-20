@@ -10,16 +10,17 @@ import UI.Screen.MainScreen;
 import UI.Screen.QuestionScreen;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameManager extends JFrame {
     private final List<Player> players = new ArrayList<>();
+    private int currentPlayerIndex = 0;
     private List<Question> questions;
     private final SocketServer serverSocket;
     private final DataBase db;
     private final String[] categoryList = {"SPORT", "LAND", "ESSEN", "SCHAUSPIELER", "VIDEO-SPIEL"};
+    private final List<Question> answeredQuestionList;
 
     private final EndScreen endScreen;
     private final JoinScreen joinScreen;
@@ -33,6 +34,7 @@ public class GameManager extends JFrame {
         this.joinScreen = new JoinScreen();
         this.mainScreen = new MainScreen();
         this.questionScreen = new QuestionScreen();
+        this.answeredQuestionList = new ArrayList<>();
 
         this.setResizable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -47,7 +49,7 @@ public class GameManager extends JFrame {
         int questionId = 1;
         for (String category : categoryList) {
             for (int j = 1; j <= 5; j++) {
-                questions.add(new Question("TEST QUESTION", category, "RIGHT ANSWER",
+                questions.add(new Question("TEST QUESTIONmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", category, "RIGHT ANSWER",
                         new String[]{"WRONG ANSWER 1", "WRONG ANSWER 2", "WRONG ANSWER 3"}, j * 10, questionId));
                 questionId++;
             }
@@ -57,10 +59,6 @@ public class GameManager extends JFrame {
     public void cleanScreen() {
         this.getContentPane().removeAll();
         this.getContentPane().repaint();
-    }
-
-    public void addPlayer(String name) {
-        this.players.add(new Player(name));
     }
 
     public void answerQuestion(Question question, String name){
@@ -101,5 +99,17 @@ public class GameManager extends JFrame {
 
     public QuestionScreen getQuestionScreen() {
         return questionScreen;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
+
+    public void setCurrentPlayerIndex(int currentPlayerIndex) {
+        this.currentPlayerIndex = currentPlayerIndex;
+    }
+
+    public List<Question> getAnsweredQuestionList() {
+        return answeredQuestionList;
     }
 }

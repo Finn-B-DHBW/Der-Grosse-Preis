@@ -1,10 +1,11 @@
 package Model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
     private final String name;
-    private List<Question> rightAnswers;
+    private final List<Question> rightAnswers = new ArrayList<>();
     private int score;
 
     public Player(String name) {
@@ -23,9 +24,9 @@ public class Player {
         return score;
     }
 
-    public void addRightAnswerToList(Question rightAnswers, String name) {
-        this.rightAnswers.add(rightAnswers);
-        this.score += rightAnswers.getScore();
+    public void addRightAnswerToList(Question rightQuestion) {
+        this.rightAnswers.add(rightQuestion);
+        this.score += rightQuestion.getScore();
     }
 
 }
