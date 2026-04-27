@@ -15,16 +15,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class QuestionScreen {
 
-    public void showQuestionScreen(GameManager gm, Question question) {
+    public void showQuestionScreen(GameManager gameManager, Question question) {
         //Screen that will display the selected question and the different answer possibilities
-        gm.cleanScreen();
+        gameManager.cleanScreen();
         //Test Segment to see if the right question is being displayed
-        JPanel panelMain = new JPanel();
-        panelMain.setBackground(Color.GREEN);
-        panelMain.setLayout(new BoxLayout(panelMain, BoxLayout.Y_AXIS));
-        panelMain.setBorder(new EmptyBorder(10, 10, 10, 10));
-        panelMain.setAlignmentY(Component.CENTER_ALIGNMENT);
-        panelMain.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(Color.GREEN);
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        mainPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        mainPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel questionLabel = new JLabel(question.getQuestionText());
         questionLabel.setPreferredSize(new Dimension(1000, 200));
@@ -32,47 +32,47 @@ public class QuestionScreen {
         questionLabel.setBorder(new LineBorder(Color.RED, 2));
         questionLabel.setHorizontalAlignment(SwingConstants.CENTER);
         questionLabel.setVerticalAlignment(SwingConstants.CENTER);
-        panelMain.add(questionLabel);
+        mainPanel.add(questionLabel);
 
-        JPanel p = new JPanel(new GridLayout(2, 2, 10, 10));
-        setUpAnswerButtons(p, question, gm);
+        JPanel questionButtonsPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        setUpAnswerButtons(questionButtonsPanel, question, gameManager);
 
-        panelMain.add(p);
+        mainPanel.add(questionButtonsPanel);
 
-        gm.add(panelMain);
-        gm.setVisible(true);
+        gameManager.add(mainPanel);
+        gameManager.setVisible(true);
     }
 
-    private void setUpAnswerButtons(JPanel panel, Question question, GameManager gm) {
+    private void setUpAnswerButtons(JPanel questionButtonsPanel, Question question, GameManager gameManager) {
         String rightAnswer = question.getRightAnswer();
-        List<String> answers = new ArrayList<>(Arrays.asList(question.getWrongAnswers()));
-        answers.add(rightAnswer);
-        Collections.shuffle(answers);
+        List<String> answerList = new ArrayList<>(Arrays.asList(question.getWrongAnswers()));
+        answerList.add(rightAnswer);
+        Collections.shuffle(answerList);
 
         AtomicBoolean isPressedOnce = new AtomicBoolean(false);
-        JButton[] answerButtons = new JButton[4];
+        JButton[] answerButtonList = new JButton[4];
 
-        for(int i = 0; i< answerButtons.length; i++){
-            answerButtons[i] = new JButton(answers.get(i));
+        for(int i = 0; i< answerButtonList.length; i++){
+            answerButtonList[i] = new JButton(answerList.get(i));
         }
 
-        for (JButton button : answerButtons) {
-            button.addActionListener(e -> {
+        for (JButton answerButton : answerButtonList) {
+            answerButton.addActionListener(e -> {
 
-                if (button.getText().equals(rightAnswer) && !isPressedOnce.get()) {
-                    gm.getPlayers().get(gm.getCurrentPlayerIndex()).addRightAnswerToList(question);
+                if (answerButton.getText().equals(rightAnswer) && !isPressedOnce.get()) {
+                    gameManager.getPlayerList().get(gameManager.getCurrentPlayerIndex()).addRightAnswerToList(question);
                 }
-                revealButtonColor(answerButtons, rightAnswer);
+                revealButtonColor(answerButtonList, rightAnswer);
 
                 if (isPressedOnce.get()) {
-                    switchPlayer(gm);
-                    gm.getAnsweredQuestionList().add(question);
-                    gm.getMainScreen().showMainScreen(gm);
+                    switchPlayer(gameManager);
+                    gameManager.getAnsweredQuestionList().add(question);
+                    gameManager.getMainScreen().showMainScreen(gameManager);
                 }
 
                 isPressedOnce.set(true);
             });
-            panel.add(button);
+            questionButtonsPanel.add(answerButton);
         }
     }
 
@@ -86,11 +86,11 @@ public class QuestionScreen {
         }
     }
 
-    private void switchPlayer(GameManager gm) {
-        if(gm.getCurrentPlayerIndex() == gm.getPlayers().size()-1) {
-            gm.setCurrentPlayerIndex(0);
+    private void switchPlayer(GameManager gameManager) {
+        if(gameManager.getCurrentPlayerIndex() == gameManager.getPlayerList().size()-1) {
+            gameManager.setCurrentPlayerIndex(0);
         } else {
-            gm.setCurrentPlayerIndex(gm.getCurrentPlayerIndex()+1);
+            gameManager.setCurrentPlayerIndex(gameManager.getCurrentPlayerIndex()+1);
         }
     }
 
