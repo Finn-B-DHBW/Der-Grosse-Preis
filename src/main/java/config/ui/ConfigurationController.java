@@ -58,52 +58,54 @@ public class ConfigurationController
     }
 
     private void wireListeners() {
-        configurationPanel.buttonDone.addActionListener(e -> {
+        configurationPanel.getButtonDone().addActionListener(e -> {
             configuratorOverview.saveConfigurationToDatabase();
             mainView.showPage(configuratorPanel);
         });
 
-        configurationPanel.textFieldConfigurationTitle.addFocusListener(new FocusAdapter() {
+        configurationPanel.getTextFieldConfigurationTitle().addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 if (!hasBuilder()) return;
                 configuratorOverview.configurationBuilder
-                        .setTitle(configurationPanel.textFieldConfigurationTitle.getText());
+                        .setTitle(configurationPanel.getTextFieldConfigurationTitle().getText());
                 updateConfigButtonTitle();
             }
         });
 
-        configurationPanel.textFieldNumberOfQuestions.addFocusListener(new FocusAdapter() {
+        configurationPanel.getTextFieldNumberOfQuestions().addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
                 applyNumberOfQuestionsFromTextField();
             }
         });
 
-        if (configurationPanel.spinnerNumberOfQuestions != null) {
-            configurationPanel.spinnerNumberOfQuestions.addChangeListener(e -> {
+        JSpinner spinner = configurationPanel.getSpinnerNumberOfQuestions();
+        if (spinner != null) {
+            spinner.addChangeListener(e -> {
                 if (!hasBuilder()) return;
-                Object v = configurationPanel.spinnerNumberOfQuestions.getValue();
+                Object v = spinner.getValue();
                 if (v instanceof Number) {
                     configuratorOverview.configurationBuilder.setNumberOfQuestions(((Number) v).intValue());
                 }
             });
         }
 
-        configurationPanel.buttonAddCategory.addActionListener(e -> {
+        configurationPanel.getButtonAddCategory().addActionListener(e -> {
             configuratorOverview.configurationBuilder
-                    .createNewCategory(configurationPanel.textFieldCategoryName.getText());
-            configurationPanel.textFieldCategoryName.setText("");
+                    .createNewCategory(configurationPanel.getTextFieldCategoryName().getText());
+            configurationPanel.getTextFieldCategoryName().setText("");
             addCategoryPanel();
         });
     }
 
     private void applyNumberOfQuestionsFromTextField() {
         if (!hasBuilder()) return;
-        Object valueObj = configurationPanel.textFieldNumberOfQuestions.getValue();
+        JFormattedTextField field = configurationPanel.getTextFieldNumberOfQuestions();
+        Object valueObj = field.getValue();
         if (valueObj instanceof Number) {
             configuratorOverview.configurationBuilder.setNumberOfQuestions(((Number) valueObj).intValue());
             return;
         }
-        String text = configurationPanel.textFieldNumberOfQuestions.getText();
+        String text = field.getText();
         if (text == null || text.isBlank()) return;
         try {
             int value = Integer.parseInt(text.trim());
@@ -128,14 +130,15 @@ public class ConfigurationController
 
         String pageName = "categoryPanel_" + System.currentTimeMillis();
         mainView.addPage(pageName, categoryPanel);
-        categoryPanel.buttonDone.addActionListener(evt -> mainView.showPage(configurationPanel));
+        categoryPanel.getButtonDone().addActionListener(evt -> mainView.showPage(configurationPanel));
 
         CategoryExpandablePanel exp = new CategoryExpandablePanel(lastCategory);
         exp.setCategoryName(categoryName);
-        exp.editButton.addActionListener(evt -> mainView.showPage(categoryPanel));
-        configurationPanel.panelCategoryButtons.add(exp);
-        configurationPanel.panelCategoryButtons.revalidate();
-        configurationPanel.panelCategoryButtons.repaint();
+        exp.getEditButton().addActionListener(evt -> mainView.showPage(categoryPanel));
+        JPanel categoryButtons = configurationPanel.getPanelCategoryButtons();
+        categoryButtons.add(exp);
+        categoryButtons.revalidate();
+        categoryButtons.repaint();
 
         mainView.showPage(categoryPanel);
     }
