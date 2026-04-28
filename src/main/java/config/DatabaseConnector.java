@@ -121,48 +121,11 @@ public class DatabaseConnector {
             ensureTables(con);
             con.setAutoCommit(false);
 
-            int configId;
-            try (PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO Configuration(title) VALUES(?)",
-                    Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, configuration.getTitle());
-                ps.executeUpdate();
-                try (ResultSet keys = ps.getGeneratedKeys()) {
-                    keys.next();
-                    configId = keys.getInt(1);
-                }
-            }
-
+            int configId = insertConfiguration(con, configuration);
             for (Category cat : configuration.getCategories()) {
-                int categoryId;
-                try (PreparedStatement ps = con.prepareStatement(
-                        "INSERT INTO ConfigCategory(configId, name) VALUES(?, ?)",
-                        Statement.RETURN_GENERATED_KEYS)) {
-                    ps.setInt(1, configId);
-                    ps.setString(2, cat.getName());
-                    ps.executeUpdate();
-                    try (ResultSet keys = ps.getGeneratedKeys()) {
-                        keys.next();
-                        categoryId = keys.getInt(1);
-                    }
-                }
-
+                int categoryId = insertCategory(con, configId, cat);
                 for (Map.Entry<Integer, ConfigQuestion> entry : cat.getPointQuestionMap().entrySet()) {
-                    int points = entry.getKey();
-                    ConfigQuestion q = entry.getValue();
-                    List<String> answers = q.getAnswers();
-                    try (PreparedStatement ps = con.prepareStatement(
-                            "INSERT INTO ConfigQuestionEntry(categoryId, points, questionText, " +
-                            "answer1, answer2, answer3, correctAnswer) VALUES(?, ?, ?, ?, ?, ?, ?)")) {
-                        ps.setInt(1, categoryId);
-                        ps.setInt(2, points);
-                        ps.setString(3, q.getQuestion());
-                        ps.setString(4, answers.size() > 0 ? answers.get(0) : "");
-                        ps.setString(5, answers.size() > 1 ? answers.get(1) : "");
-                        ps.setString(6, answers.size() > 2 ? answers.get(2) : "");
-                        ps.setInt(7, q.getCorrectAnswer());
-                        ps.executeUpdate();
-                    }
+                    insertQuestion(con, categoryId, entry.getKey(), entry.getValue());
                 }
             }
 
@@ -171,5 +134,53 @@ public class DatabaseConnector {
         } catch (SQLException e) {
             log.severe("Error saving configuration: " + e.getMessage());
         }
+    }
+
+    private static int insertConfiguration(Connection con, Configuration configuration) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO Configuration(title) VALUES(?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, configuration.getTitle());
+            ps.executeUpdate();
+            return generatedKey(ps);
+        }
+    }
+
+    private static int insertCategory(Connection con, int configId, Category category) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO ConfigCategory(configId, name) VALUES(?, ?)",
+                Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, configId);
+            ps.setString(2, category.getName());
+            ps.executeUpdate();
+            return generatedKey(ps);
+        }
+    }
+
+    private static void insertQuestion(Connection con, int categoryId, int points, ConfigQuestion question) throws SQLException {
+        List<String> answers = question.getAnswers();
+        try (PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO ConfigQuestionEntry(categoryId, points, questionText, " +
+                "answer1, answer2, answer3, correctAnswer) VALUES(?, ?, ?, ?, ?, ?, ?)")) {
+            ps.setInt(1, categoryId);
+            ps.setInt(2, points);
+            ps.setString(3, question.getQuestion());
+            ps.setString(4, answerOrEmpty(answers, 0));
+            ps.setString(5, answerOrEmpty(answers, 1));
+            ps.setString(6, answerOrEmpty(answers, 2));
+            ps.setInt(7, question.getCorrectAnswer());
+            ps.executeUpdate();
+        }
+    }
+
+    private static int generatedKey(PreparedStatement ps) throws SQLException {
+        try (ResultSet keys = ps.getGeneratedKeys()) {
+            keys.next();
+            return keys.getInt(1);
+        }
+    }
+
+    private static String answerOrEmpty(List<String> answers, int index) {
+        return answers.size() > index ? answers.get(index) : "";
     }
 }
