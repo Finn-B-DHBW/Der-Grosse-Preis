@@ -1,12 +1,14 @@
 package UI.Screen;
 
 import Manager.GameManager;
-import UI.JButtonWithCustomAttribute;
+import Model.Question;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 public class MainScreen {
 
@@ -60,42 +62,63 @@ public class MainScreen {
     }
 
     private JPanel setUpCenterJPanel(GameManager gameManager) {
-        JPanel centerPanelMain = new JPanel(new GridLayout(6, 5, 10, 10));
+        String[] categories = gameManager.getCategoryList();
+        List<Integer> pointValues = getPointValues(gameManager);
+
+        JPanel centerPanelMain = new JPanel(new GridLayout(pointValues.size() + 1, categories.length, 10, 10));
         centerPanelMain.setBorder(new EmptyBorder(10, 10, 10, 10));
         centerPanelMain.setBackground(Color.GREEN);
 
-        for (String s : gameManager.getCategoryList()) {
+        for (String s : categories) {
             JLabel category = new JLabel(s, SwingConstants.CENTER);
             category.setBackground(Color.DARK_GRAY);
             category.getFont();
             centerPanelMain.add(category);
         }
 
-        int questionIdCount;
-
-        for (int i = 1; i < 6; i++) {
-            questionIdCount = i;
-            for (int j = 1; j < 6; j++) {
-                JButtonWithCustomAttribute button = new JButtonWithCustomAttribute(questionIdCount);
-                button.setText(i * 10 + " Points");
-                //If a question is selected, show the QuestionScreen with the question
-                button.addActionListener(e -> gameManager.getQuestionScreen().showQuestionScreen(gameManager, Objects.requireNonNull(gameManager.getQuestionList().stream()
-                        .filter(q -> q.getQuestionId() == button.getQuestionId())
-                        .findFirst()
-                        .orElse(null)))
-                );
-                //disable the Button for the question that has been already used
-                if (!gameManager.getAnsweredQuestionList().isEmpty() &&
-                        gameManager.getAnsweredQuestionList().stream()
-                                .filter(q -> q.getQuestionId() == button.getQuestionId())
-                                .findFirst()
-                                .orElse(null) != null) {
+        for (Integer points : pointValues) {
+            for (String category : categories) {
+                Question question = findQuestion(gameManager, category, points);
+                JButton button = new JButton(points + " Points");
+                if (question == null) {
+                    button.setEnabled(false);
+                } else {
+                    button.addActionListener(e -> gameManager.getQuestionScreen().showQuestionScreen(gameManager, question));
+                }
+                if (question != null && isAnswered(gameManager, question)) {
                     button.setEnabled(false);
                 }
                 centerPanelMain.add(button);
-                questionIdCount += 5;
             }
         }
         return centerPanelMain;
+    }
+
+    private List<Integer> getPointValues(GameManager gameManager) {
+        TreeSet<Integer> pointValues = new TreeSet<>();
+        if (gameManager.getQuestionList() != null) {
+            for (Question question : gameManager.getQuestionList()) {
+                pointValues.add(question.getScore());
+            }
+        }
+        return new ArrayList<>(pointValues);
+    }
+
+    private Question findQuestion(GameManager gameManager, String category, int points) {
+        if (gameManager.getQuestionList() == null) {
+            return null;
+        }
+
+        for (Question question : gameManager.getQuestionList()) {
+            if (question.getCategory().equals(category) && question.getScore() == points) {
+                return question;
+            }
+        }
+        return null;
+    }
+
+    private boolean isAnswered(GameManager gameManager, Question question) {
+        return gameManager.getAnsweredQuestionList().stream()
+                .anyMatch(answeredQuestion -> answeredQuestion.getQuestionId() == question.getQuestionId());
     }
 }

@@ -34,7 +34,7 @@ public class QuestionScreen {
         questionLabel.setVerticalAlignment(SwingConstants.CENTER);
         mainPanel.add(questionLabel);
 
-        JPanel questionButtonsPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        JPanel questionButtonsPanel = new JPanel(new GridLayout(0, 2, 10, 10));
         setUpAnswerButtons(questionButtonsPanel, question, gameManager);
 
         mainPanel.add(questionButtonsPanel);
@@ -45,12 +45,15 @@ public class QuestionScreen {
 
     private void setUpAnswerButtons(JPanel questionButtonsPanel, Question question, GameManager gameManager) {
         String rightAnswer = question.getRightAnswer();
-        List<String> answerList = new ArrayList<>(Arrays.asList(question.getWrongAnswers()));
+        List<String> answerList = new ArrayList<>();
+        if (question.getWrongAnswers() != null) {
+            answerList.addAll(Arrays.asList(question.getWrongAnswers()));
+        }
         answerList.add(rightAnswer);
         Collections.shuffle(answerList);
 
         AtomicBoolean isPressedOnce = new AtomicBoolean(false);
-        JButton[] answerButtonList = new JButton[4];
+        JButton[] answerButtonList = new JButton[answerList.size()];
 
         for(int i = 0; i< answerButtonList.length; i++){
             answerButtonList[i] = new JButton(answerList.get(i));
