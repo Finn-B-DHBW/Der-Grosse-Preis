@@ -11,7 +11,12 @@ public class CategoryExpandablePanel extends JPanel {
     private final Category categoryModel;
     private final JButton toggleButton = new JButton("▶");
     private final JLabel nameLabel = new JLabel("");
-    public final JButton editButton = new JButton("bearbeiten");
+    private final JButton editButton = new JButton("bearbeiten");
+
+    public JButton getEditButton() {
+        return editButton;
+    }
+
     private final JPanel contentPanel = new JPanel();
     private final JPanel header;
     private boolean expanded = false;

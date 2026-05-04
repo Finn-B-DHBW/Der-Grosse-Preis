@@ -5,142 +5,140 @@ import config.model.Category;
 import config.model.Configuration;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConfigurationController
 {
+    private static final String DEFAULT_CATEGORY_NAME = "Kategorie";
+    private static final String DEFAULT_CONFIG_TITLE = "Konfiguration";
+    private static final Logger log = Logger.getLogger(ConfigurationController.class.getName());
+
     private final ConfigurationPanel configurationPanel;
     private final ConfiguratorOverview configuratorOverview;
     private final MainView mainView;
     private final ConfiguratorPanel configuratorPanel;
+
+    private JButton currentConfigButton;
 
     public ConfigurationController(ConfigurationPanel configurationPanel, MainView mainView, ConfiguratorOverview configuratorOverview, ConfiguratorPanel configuratorPanel) {
         this.configurationPanel = configurationPanel;
         this.configuratorOverview = configuratorOverview;
         this.mainView = mainView;
         this.configuratorPanel = configuratorPanel;
-        wireButtonsLazily();
+        wireListeners();
     }
-
-    private JButton currentConfigButton;
 
     public void setCurrentConfigButton(JButton button) {
         this.currentConfigButton = button;
     }
 
-    private void updateConfigButtonTitle() {
-        if (currentConfigButton != null && configuratorOverview != null && configuratorOverview.configurationBuilder != null) {
-            String t = configuratorOverview.configurationBuilder.getConfiguration().getTitle();
-            if (t == null || t.isBlank()) t = "Konfiguration";
-            currentConfigButton.setText(t);
-            currentConfigButton.revalidate();
-            currentConfigButton.repaint();
-        }
+    private boolean hasBuilder() {
+        return configuratorOverview != null && configuratorOverview.configurationBuilder != null;
     }
 
-    private void wireButtonsLazily() {
-        configurationPanel.buttonDone.addActionListener(e -> {
+    private Category getLastCategory() {
+        if (!hasBuilder()) return null;
+        Configuration cfg = configuratorOverview.configurationBuilder.getConfiguration();
+        List<Category> cats = cfg.getCategories();
+        if (cats == null || cats.isEmpty()) return null;
+        return cats.get(cats.size() - 1);
+    }
+
+    private void updateConfigButtonTitle() {
+        if (currentConfigButton == null || !hasBuilder()) return;
+        String title = configuratorOverview.configurationBuilder.getConfiguration().getTitle();
+        if (title == null || title.isBlank()) title = DEFAULT_CONFIG_TITLE;
+        currentConfigButton.setText(title);
+        currentConfigButton.revalidate();
+        currentConfigButton.repaint();
+    }
+
+    private void wireListeners() {
+        configurationPanel.getButtonDone().addActionListener(e -> {
             configuratorOverview.saveConfigurationToDatabase();
             mainView.showPage(configuratorPanel);
         });
 
-        configurationPanel.textFieldConfigurationTitle.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (configuratorOverview != null && configuratorOverview.configurationBuilder != null) {
-                    configuratorOverview.configurationBuilder
-                            .setTitle(configurationPanel.textFieldConfigurationTitle.getText());
-                    updateConfigButtonTitle();
-                }
+        configurationPanel.getTextFieldConfigurationTitle().addFocusListener(new FocusAdapter() {
+            @Override public void focusLost(FocusEvent e) {
+                if (!hasBuilder()) return;
+                configuratorOverview.configurationBuilder
+                        .setTitle(configurationPanel.getTextFieldConfigurationTitle().getText());
+                updateConfigButtonTitle();
             }
         });
 
-        configurationPanel.textFieldNumberOfQuestions.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (configuratorOverview != null && configuratorOverview.configurationBuilder != null) {
-                    Object valueObj = configurationPanel.textFieldNumberOfQuestions.getValue();
-                    if (valueObj instanceof Number) {
-                        configuratorOverview.configurationBuilder.setNumberOfQuestions(((Number) valueObj).intValue());
-                    } else {
-                        try {
-                            String text = configurationPanel.textFieldNumberOfQuestions.getText();
-                            if (text != null && !text.isBlank()) {
-                                int value = Integer.parseInt(text.trim());
-                                configuratorOverview.configurationBuilder.setNumberOfQuestions(value);
-                            }
-                        } catch (NumberFormatException ex) {
-                            // ignore invalid input silently
-                        }
-                    }
-                }
+        configurationPanel.getTextFieldNumberOfQuestions().addFocusListener(new FocusAdapter() {
+            @Override public void focusLost(FocusEvent e) {
+                applyNumberOfQuestionsFromTextField();
             }
         });
 
-        if (configurationPanel.spinnerNumberOfQuestions != null) {
-            configurationPanel.spinnerNumberOfQuestions.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    if (configuratorOverview != null && configuratorOverview.configurationBuilder != null) {
-                        Object v = configurationPanel.spinnerNumberOfQuestions.getValue();
-                        if (v instanceof Number) {
-                            configuratorOverview.configurationBuilder.setNumberOfQuestions(((Number) v).intValue());
-                        }
-                    }
+        JSpinner spinner = configurationPanel.getSpinnerNumberOfQuestions();
+        if (spinner != null) {
+            spinner.addChangeListener(e -> {
+                if (!hasBuilder()) return;
+                Object v = spinner.getValue();
+                if (v instanceof Number) {
+                    configuratorOverview.configurationBuilder.setNumberOfQuestions(((Number) v).intValue());
                 }
             });
         }
 
-        configurationPanel.buttonAddCategory.addActionListener(e -> {
+        configurationPanel.getButtonAddCategory().addActionListener(e -> {
             configuratorOverview.configurationBuilder
-                    .createNewCategory(configurationPanel.textFieldCategoryName.getText());
-            configurationPanel.textFieldCategoryName.setText("");
+                    .createNewCategory(configurationPanel.getTextFieldCategoryName().getText());
+            configurationPanel.getTextFieldCategoryName().setText("");
             addCategoryPanel();
         });
     }
 
-    private void addCategoryPanel(){
+    private void applyNumberOfQuestionsFromTextField() {
+        if (!hasBuilder()) return;
+        JFormattedTextField field = configurationPanel.getTextFieldNumberOfQuestions();
+        Object valueObj = field.getValue();
+        if (valueObj instanceof Number) {
+            configuratorOverview.configurationBuilder.setNumberOfQuestions(((Number) valueObj).intValue());
+            return;
+        }
+        String text = field.getText();
+        if (text == null || text.isBlank()) return;
+        try {
+            int value = Integer.parseInt(text.trim());
+            configuratorOverview.configurationBuilder.setNumberOfQuestions(value);
+        } catch (NumberFormatException ex) {
+            log.log(Level.FINE, "Invalid input for number of questions: " + text, ex);
+        }
+    }
+
+    private void addCategoryPanel() {
+        Category lastCategory = getLastCategory();
         CategoryPanel categoryPanel = new CategoryPanel();
         CategoryController categoryController = new CategoryController(categoryPanel, mainView, configuratorOverview);
 
-        String categoryName = null;
-        if (configuratorOverview != null && configuratorOverview.configurationBuilder != null) {
-            Configuration cfg = configuratorOverview.configurationBuilder.getConfiguration();
-            List<Category> cats = cfg.getCategories();
-            if (cats != null && !cats.isEmpty()) {
-                Category last = cats.get(cats.size() - 1);
-                categoryName = last.getName();
-                categoryPanel.setCategoryName(categoryName);
-                categoryController.populateFromCategory(last);
-            }
+        String categoryName = DEFAULT_CATEGORY_NAME;
+        if (lastCategory != null) {
+            categoryName = (lastCategory.getName() != null && !lastCategory.getName().isBlank())
+                    ? lastCategory.getName() : DEFAULT_CATEGORY_NAME;
+            categoryPanel.setCategoryName(categoryName);
+            categoryController.populateFromCategory(lastCategory);
         }
 
         String pageName = "categoryPanel_" + System.currentTimeMillis();
         mainView.addPage(pageName, categoryPanel);
+        categoryPanel.getButtonDone().addActionListener(evt -> mainView.showPage(configurationPanel));
 
-        categoryPanel.buttonDone.addActionListener(evt -> mainView.showPage(configurationPanel));
-
-        if (categoryName == null || categoryName.isBlank()) {
-            categoryName = "Kategorie";
-        }
-        Category catModel = null;
-        if (configuratorOverview != null && configuratorOverview.configurationBuilder != null) {
-            Configuration cfg2 = configuratorOverview.configurationBuilder.getConfiguration();
-            List<Category> cats2 = cfg2.getCategories();
-            if (cats2 != null && !cats2.isEmpty()) {
-                catModel = cats2.get(cats2.size() - 1);
-            }
-        }
-        CategoryExpandablePanel exp = new CategoryExpandablePanel(catModel);
+        CategoryExpandablePanel exp = new CategoryExpandablePanel(lastCategory);
         exp.setCategoryName(categoryName);
-        CategoryPanel targetPanel = categoryPanel;
-        exp.editButton.addActionListener(evt -> mainView.showPage(targetPanel));
-        configurationPanel.panelCategoryButtons.add(exp);
-        configurationPanel.panelCategoryButtons.revalidate();
-        configurationPanel.panelCategoryButtons.repaint();
+        exp.getEditButton().addActionListener(evt -> mainView.showPage(categoryPanel));
+        JPanel categoryButtons = configurationPanel.getPanelCategoryButtons();
+        categoryButtons.add(exp);
+        categoryButtons.revalidate();
+        categoryButtons.repaint();
 
         mainView.showPage(categoryPanel);
     }

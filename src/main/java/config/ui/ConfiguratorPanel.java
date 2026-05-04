@@ -5,13 +5,16 @@ import java.awt.*;
 
 public class ConfiguratorPanel extends JPanel {
 
-    public JButton buttonCreate;
-    public JButton buttonEdit;
-    public JButton buttonDuplicate;
-    public JButton buttonDelete;
+    private JButton buttonCreate;
+    private JButton buttonEdit;
+    private JButton buttonDuplicate;
+    private JButton buttonDelete;
 
-    public JLabel labelConfigurations = new JLabel("Konfigurationen");
-    public JPanel panelConfigurationButtons = new JPanel();
+    private final JLabel labelConfigurations = new JLabel("Konfigurationen");
+    private final JPanel panelConfigurationButtons = new JPanel();
+
+    public JButton getButtonCreate() { return buttonCreate; }
+    public JPanel getPanelConfigurationButtons() { return panelConfigurationButtons; }
 
     public ConfiguratorPanel() {
         setLayout(new BorderLayout());

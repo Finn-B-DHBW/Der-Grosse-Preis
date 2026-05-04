@@ -5,18 +5,26 @@ import java.awt.*;
 
 public class ConfigurationPanel extends JPanel {
 
-    public JTextField textFieldConfigurationTitle = new JTextField(20);
+    private final JTextField textFieldConfigurationTitle = new JTextField(20);
 
-    public JFormattedTextField textFieldNumberOfQuestions;
-    public JSpinner spinnerNumberOfQuestions;
+    private JFormattedTextField textFieldNumberOfQuestions;
+    private JSpinner spinnerNumberOfQuestions;
 
-    public JTextField textFieldCategoryName = new JTextField(20);
-    public JButton buttonAddCategory = new JButton("hinzufügen");
+    private final JTextField textFieldCategoryName = new JTextField(20);
+    private final JButton buttonAddCategory = new JButton("hinzufügen");
 
-    private JLabel labelCategories = new JLabel("Kategorien");
-    public JPanel panelCategoryButtons = new JPanel();
+    private final JLabel labelCategories = new JLabel("Kategorien");
+    private final JPanel panelCategoryButtons = new JPanel();
 
-    public JButton buttonDone = new JButton("Fertig");
+    private final JButton buttonDone = new JButton("Fertig");
+
+    public JTextField getTextFieldConfigurationTitle() { return textFieldConfigurationTitle; }
+    public JFormattedTextField getTextFieldNumberOfQuestions() { return textFieldNumberOfQuestions; }
+    public JSpinner getSpinnerNumberOfQuestions() { return spinnerNumberOfQuestions; }
+    public JTextField getTextFieldCategoryName() { return textFieldCategoryName; }
+    public JButton getButtonAddCategory() { return buttonAddCategory; }
+    public JPanel getPanelCategoryButtons() { return panelCategoryButtons; }
+    public JButton getButtonDone() { return buttonDone; }
 
     public ConfigurationPanel() {
         setLayout(new BorderLayout());

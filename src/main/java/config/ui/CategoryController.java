@@ -27,7 +27,7 @@ public class CategoryController
         if (questionPanels == null || questionPanels.isEmpty()) {
             return;
         }
-        JPanel container = categoryPanel.questionsContainer != null ? categoryPanel.questionsContainer : categoryPanel;
+        JPanel container = categoryPanel.getQuestionsContainer();
         for (JPanel qp : questionPanels) {
             qp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             Dimension pref = qp.getPreferredSize();

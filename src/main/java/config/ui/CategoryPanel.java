@@ -5,8 +5,11 @@ import java.awt.*;
 
 public class CategoryPanel extends JPanel {
     private final JLabel titleLabel = new JLabel("Kategorie");
-    public JButton buttonDone = new JButton("fertig");
-    public JPanel questionsContainer = new JPanel();
+    private final JButton buttonDone = new JButton("fertig");
+    private final JPanel questionsContainer = new JPanel();
+
+    public JButton getButtonDone() { return buttonDone; }
+    public JPanel getQuestionsContainer() { return questionsContainer; }
 
     public CategoryPanel() {
         setLayout(new BorderLayout());
