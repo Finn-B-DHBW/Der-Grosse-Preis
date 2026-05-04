@@ -1,3 +1,8 @@
+package Connection;
+
+import Model.Question;
+import Manager.GameManager;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -7,16 +12,19 @@ public class DataBase {
     private Logger log;
 
     //todo db connection keine prio
-    DataBase(GameManager gameManager) {
+    public DataBase() {
         log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
         try {
-
             con = DriverManager.getConnection("jdbc:sqlite:database.db");
             createTable();
         } catch (Exception e) {
             log.severe(e.getMessage());
         }
+    }
+
+    public DataBase(GameManager gameManager) {
+        this();
     }
 
     private void createTable(){
@@ -55,7 +63,7 @@ public class DataBase {
         String insertQuestion = "INSERT INTO Question(questionText, category, rightAnswer, score) VALUES(?,?,?,?)";
         int questionId = 0;
 
-        //einfügen der Frage in die Question DB; in questionId wird der primaryKey gespeichert für die Wrong answers(1:m beziehung)
+        //einfügen der Frage in die Model.Question DB; in questionId wird der primaryKey gespeichert für die Wrong answers(1:m beziehung)
         try(PreparedStatement preparedStatement = con.prepareStatement(insertQuestion, Statement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setString(1, questionText);
@@ -109,7 +117,7 @@ public class DataBase {
         int amountPerCategory = amount / categories.length;
 
         for (String category : categories) {
-            String selectQuestions = "SELECT questionText, rightAnswer, score, questionId FROM Question WHERE category = ? LIMIT ?";
+            String selectQuestions = "SELECT questionText, category, rightAnswer, score, questionId FROM Question WHERE category = ? LIMIT ?";
             try (PreparedStatement prep = con.prepareStatement(selectQuestions)) {
 
                 prep.setString(1, category);
@@ -135,8 +143,11 @@ public class DataBase {
                 prep.setInt(1, question.getQuestionId());
 
                 ResultSet rs = prep.executeQuery();
-
-                question.setWrongAnswers(rs.toString().split(","));
+                ArrayList<String> wrongAnswerTexts = new ArrayList<>();
+                while (rs.next()) {
+                    wrongAnswerTexts.add(rs.getString("wrongAnswerText"));
+                }
+                question.setWrongAnswers(wrongAnswerTexts.toArray(new String[0]));
             } catch (SQLException e) {
                 log.severe(e.getMessage());
                 return new Question[0];
@@ -150,8 +161,12 @@ public class DataBase {
     public String[] getCategories(){
         try(Statement stmt = con.createStatement()){
             String selectCategories = "SELECT DISTINCT category FROM Question";
-
-            return stmt.executeQuery(selectCategories).toString().split(",");
+            ResultSet rs = stmt.executeQuery(selectCategories);
+            ArrayList<String> categories = new ArrayList<>();
+            while (rs.next()) {
+                categories.add(rs.getString("category"));
+            }
+            return categories.toArray(new String[0]);
         }catch (SQLException e){
             log.severe(e.getMessage());
         }
