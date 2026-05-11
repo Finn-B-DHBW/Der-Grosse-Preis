@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -23,12 +24,21 @@ jobs:
       - name: Run unit tests
         run: mvn -B test
 
+      - name: Publish unit test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Results
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
     needs: unit-tests
     permissions:
       contents: read
+      checks: write
 
     steps:
       - uses: actions/checkout@v4
@@ -40,5 +50,16 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Compile test classes
+        run: mvn -B test-compile
+
       - name: Run integration tests
         run: mvn -B failsafe:integration-test failsafe:verify
+
+      - name: Publish integration test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Integration Test Results
+          path: target/failsafe-reports/*.xml
+          reporter: java-junit
