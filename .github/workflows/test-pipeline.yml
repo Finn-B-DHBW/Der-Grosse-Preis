@@ -29,7 +29,7 @@ jobs:
         if: always()
         with:
           name: Unit Test Results
-          path: target/surefire-reports/*.xml
+          path: target/surefire-reports/TEST-*.xml
           reporter: java-junit
 
   integration-tests:
@@ -61,5 +61,5 @@ jobs:
         if: always()
         with:
           name: Integration Test Results
-          path: target/failsafe-reports/*.xml
+          path: target/failsafe-reports/TEST-*.xml
           reporter: java-junit
