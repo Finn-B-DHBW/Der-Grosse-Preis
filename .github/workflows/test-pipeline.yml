@@ -109,17 +109,17 @@ jobs:
           python-version: '3.12'
 
       # Tests ausfuehren + alle Metrik-Reports generieren:
-      #   mvn test         -> Unit-Tests + JaCoCo jacoco.exec erzeugen
-      #   jacoco:report    -> target/site/jacoco/jacoco.xml (Testabdeckung)
+      #   verify           -> compile, test, package, jacoco:report (alle gebundenen Ziele)
       #   pmd:pmd          -> target/pmd.xml (Kopplung + Kohaerenz)
       #   checkstyle:check -> target/checkstyle-result.xml (Fan-Out, CDAC)
       #
-      # -Dmaven.compiler.source/target=21: JaCoCo 0.8.12 unterstuetzt Java 25
-      #   (class file version 69) nicht. Java 21-Bytecode (version 65) wird
-      #   unterstuetzt. Der Spielcode verwendet keine Java-25-spezifische Syntax,
-      #   daher ist dieser Downgrade fuer die Metrik-Analyse unbedenklich.
+      # -Dmaven.compiler.release=21: JaCoCo 0.8.12 unterstuetzt Java 25-Bytecode
+      #   (class file version 69) nicht; Java 21 (version 65) wird unterstuetzt.
+      #   --release=21 setzt Source, Target und Bootstrap-Classpath in einem Schritt
+      #   und ist zuverlaessiger als -Dsource/-Dtarget allein.
+      # -DskipITs=true: Integrationstests nicht nochmals ausfuehren.
       - name: Run tests and generate metric reports
-        run: mvn -B test jacoco:report pmd:pmd checkstyle:check -Dmaven.compiler.source=21 -Dmaven.compiler.target=21 -Dcheckstyle.failOnViolation=false -Dpmd.failOnViolation=false
+        run: mvn -B verify pmd:pmd checkstyle:check -Dmaven.compiler.release=21 -DskipITs=true -Dcheckstyle.failOnViolation=false -Dpmd.failOnViolation=false
 
       # Python-Skript parst alle XML-Reports und schreibt den Metriken-Report
       # in den GitHub Actions Job Summary (Tab "Code Metrics" > Summary)

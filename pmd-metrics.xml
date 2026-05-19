@@ -17,7 +17,7 @@
             Schwellenwert: 20 Methoden.
           - TooManyFields: Zu viele Felder als Hinweis auf mangelnde Kohaerenz.
             Schwellenwert: 15 Felder.
-          - ExcessiveClassLength: Klassen mit mehr als 500 Zeilen sind schwer wartbar.
+          - TooManyMethods/TooManyFields ersetzen ExcessiveClassLength (in PMD 7 entfernt).
     </description>
 
     <!-- ======================================================= -->
@@ -36,7 +36,7 @@
     <rule ref="category/java/design.xml/ExcessiveImports">
         <properties>
             <!-- Warnung ab 20 Import-Anweisungen in einer Klasse -->
-            <property name="minimum" value="20.0"/>
+            <property name="minimum" value="20"/>
         </properties>
     </rule>
 
@@ -64,12 +64,5 @@
         </properties>
     </rule>
 
-    <!-- Klasse zu lang: Schwer wartbar und wenig kohaesiv       -->
-    <rule ref="category/java/design.xml/ExcessiveClassLength">
-        <properties>
-            <!-- Warnung ab 500 Zeilen pro Klasse -->
-            <property name="minimum" value="500.0"/>
-        </properties>
-    </rule>
 
 </ruleset>
