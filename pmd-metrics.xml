@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<ruleset name="OO-Metriken Regeln">
+
+    <description>
+        Metriken-Regeln fuer Kopplung, Kohaerenz und Klassenbeziehungen.
+
+        Kopplung (Coupling):
+          - CouplingBetweenObjects: Anzahl der Klassen, mit denen eine Klasse direkt
+            gekoppelt ist (Attribute, lokale Variablen, Rueckgabetypen). Schwellenwert: 20.
+          - ExcessiveImports: Zu viele Import-Anweisungen als Indikator fuer hohe Kopplung.
+            Schwellenwert: 20 Imports.
+
+        Kohaerenz (Cohesion):
+          - GodClass: Erkennt Klassen, die zu viele Verantwortlichkeiten haben
+            (WMC >= 47, ATFD > 5, TCC &lt; 1/3). Niedrige Kohaerenz.
+          - TooManyMethods: Zu viele Methoden als Hinweis auf mangelnde Kohaerenz.
+            Schwellenwert: 20 Methoden.
+          - TooManyFields: Zu viele Felder als Hinweis auf mangelnde Kohaerenz.
+            Schwellenwert: 15 Felder.
+          - ExcessiveClassLength: Klassen mit mehr als 500 Zeilen sind schwer wartbar.
+    </description>
+
+    <!-- ======================================================= -->
+    <!-- Metrik 1: Kopplung (Coupling)                           -->
+    <!-- ======================================================= -->
+
+    <!-- CBO: Anzahl unterschiedlicher Klassen, mit denen diese Klasse gekoppelt ist -->
+    <rule ref="category/java/design.xml/CouplingBetweenObjects">
+        <properties>
+            <!-- Warnung ab 20 Kopplungen: Klasse haengt von zu vielen anderen ab -->
+            <property name="threshold" value="20"/>
+        </properties>
+    </rule>
+
+    <!-- Zu viele Imports: Indikator fuer hohe Abhaengigkeit zu anderen Packages -->
+    <rule ref="category/java/design.xml/ExcessiveImports">
+        <properties>
+            <!-- Warnung ab 20 Import-Anweisungen in einer Klasse -->
+            <property name="minimum" value="20.0"/>
+        </properties>
+    </rule>
+
+    <!-- ======================================================= -->
+    <!-- Metrik 2: Kohaerenz (Cohesion)                          -->
+    <!-- ======================================================= -->
+
+    <!-- God Class: WMC >= 47 UND ATFD > 5 UND TCC < 1/3       -->
+    <!-- Erkennt Klassen mit zu vielen Verantwortlichkeiten      -->
+    <rule ref="category/java/design.xml/GodClass"/>
+
+    <!-- Zu viele Methoden: Klasse hat zu viele Verantwortlichkeiten -->
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <!-- Warnung ab 20 Methoden pro Klasse -->
+            <property name="maxmethods" value="20"/>
+        </properties>
+    </rule>
+
+    <!-- Zu viele Felder: Klasse speichert zu viele Zustaende   -->
+    <rule ref="category/java/design.xml/TooManyFields">
+        <properties>
+            <!-- Warnung ab 15 Feldern pro Klasse -->
+            <property name="maxfields" value="15"/>
+        </properties>
+    </rule>
+
+    <!-- Klasse zu lang: Schwer wartbar und wenig kohaesiv       -->
+    <rule ref="category/java/design.xml/ExcessiveClassLength">
+        <properties>
+            <!-- Warnung ab 500 Zeilen pro Klasse -->
+            <property name="minimum" value="500.0"/>
+        </properties>
+    </rule>
+
+</ruleset>

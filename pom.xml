@@ -90,6 +90,120 @@
                 </executions>
             </plugin>
 
+            <!--
+              ================================================================
+              METRIK 4: Softwaretestmetriken – JaCoCo Code-Coverage
+              ================================================================
+              Gemessene Werte:
+                - Line Coverage   : Anteil der Quellcode-Zeilen, die durch Tests
+                                    ausgefuehrt werden.
+                - Branch Coverage : Anteil der Verzweigungen (if/else, switch,
+                                    ternary) die durch Tests abgedeckt sind.
+                - Method Coverage : Anteil der Methoden, die mindestens einmal
+                                    aufgerufen werden.
+                - Class Coverage  : Anteil der Klassen mit mindestens einer
+                                    getesteten Methode.
+
+              Ausgabe: target/site/jacoco/jacoco.xml (und HTML-Report)
+            -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <!-- Java-Agent vor den Tests einhaengen (erzeugt jacoco.exec) -->
+                    <execution>
+                        <id>jacoco-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- Coverage-Report nach verify generieren -->
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+              ================================================================
+              METRIK 1 + 2: Kopplung & Kohaerenz – PMD statische Analyse
+              ================================================================
+              Kopplung (Coupling):
+                - CouplingBetweenObjects : CBO – Anzahl der Klassen, mit denen
+                  eine Klasse direkt gekoppelt ist. Schwellenwert: 20.
+                - ExcessiveImports       : Hohe Import-Anzahl als Kopplungs-
+                  Indikator. Schwellenwert: 20 Imports.
+
+              Kohaerenz (Cohesion):
+                - GodClass              : Klassen mit WMC>=47, ATFD>5, TCC<1/3
+                  haben zu viele Verantwortlichkeiten (Single Responsibility).
+                - TooManyMethods        : Mehr als 20 Methoden pro Klasse.
+                - TooManyFields         : Mehr als 15 Felder pro Klasse.
+                - ExcessiveClassLength  : Mehr als 500 Zeilen pro Klasse.
+
+              Regeln definiert in: pmd-metrics.xml
+              Ausgabe: target/pmd.xml
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.26.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>pmd-metrics.xml</ruleset>
+                    </rulesets>
+                    <!-- Build soll nicht wegen Metriken fehlschlagen -->
+                    <failOnViolation>false</failOnViolation>
+                    <printFailingErrors>false</printFailingErrors>
+                    <format>xml</format>
+                    <!-- Java 21 als Analyse-Ziel (kompatibel mit dem Swing-Code) -->
+                    <targetJdk>21</targetJdk>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <includeTests>false</includeTests>
+                </configuration>
+            </plugin>
+
+            <!--
+              ================================================================
+              METRIK 1 + 3: Kopplung & Klassenbeziehungen – Checkstyle
+              ================================================================
+              Kopplung (Coupling):
+                - ClassFanOutComplexity        : Anzahl unterschiedlicher Klassen,
+                  die von dieser Klasse referenziert werden (efferente Kopplung).
+                  Schwellenwert: 20.
+                - ClassDataAbstractionCoupling : Anzahl der in Methoden
+                  instantiierten Typen. Schwellenwert: 7.
+
+              Klassenbeziehungen:
+                - MethodCount : Gesamtanzahl der Methoden pro Klasse > 20.
+                  Indirekt auch Kohaerenz-Indikator.
+
+              Regeln definiert in: checkstyle-metrics.xml
+              Ausgabe: target/checkstyle-result.xml
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <configLocation>checkstyle-metrics.xml</configLocation>
+                    <!-- XML-Format fuer maschinelle Auswertung -->
+                    <outputFileFormat>xml</outputFileFormat>
+                    <outputFile>${project.build.directory}/checkstyle-result.xml</outputFile>
+                    <!-- Build soll nicht wegen Metriken fehlschlagen -->
+                    <failOnViolation>false</failOnViolation>
+                    <failsOnError>false</failsOnError>
+                    <violationSeverity>warning</violationSeverity>
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <consoleOutput>false</consoleOutput>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

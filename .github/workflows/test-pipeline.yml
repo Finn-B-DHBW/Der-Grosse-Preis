@@ -4,6 +4,10 @@ on:
   push:
 
 jobs:
+
+  # ============================================================
+  # Job 1: Unit-Tests
+  # ============================================================
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -32,6 +36,9 @@ jobs:
           path: target/surefire-reports/TEST-*.xml
           reporter: java-junit
 
+  # ============================================================
+  # Job 2: Integrations-Tests
+  # ============================================================
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
@@ -63,3 +70,66 @@ jobs:
           name: Integration Test Results
           path: target/failsafe-reports/TEST-*.xml
           reporter: java-junit
+
+  # ============================================================
+  # Job 3: Code-Metriken
+  #
+  # Gemessene Metriken:
+  #   1. Kopplung            - PMD (CouplingBetweenObjects, ExcessiveImports)
+  #                            Checkstyle (ClassFanOutComplexity, CDAC)
+  #   2. Kohaerenz           - PMD (GodClass, TooManyMethods, TooManyFields,
+  #                            ExcessiveClassLength)
+  #   3. Klassenbeziehungen  - Checkstyle (MethodCount) + Python-Quellanalyse
+  #                            (extends / implements Hierarchie)
+  #   4. Softwaretestmetriken- JaCoCo (Line/Branch/Method/Class Coverage)
+  #                            Surefire (Testerfolgsrate)
+  #
+  # Ausgabe: GitHub Actions Job Summary (sichtbar im Job-Tab als Markdown)
+  #          + Artifacts: metrics-reports/ (30 Tage Aufbewahrung)
+  # ============================================================
+  metrics:
+    name: Code Metrics
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Tests ausfuehren + alle Metrik-Reports generieren:
+      #   mvn test         -> Unit-Tests + JaCoCo jacoco.exec erzeugen
+      #   jacoco:report    -> target/site/jacoco/jacoco.xml (Testabdeckung)
+      #   pmd:pmd          -> target/pmd.xml (Kopplung + Kohaerenz)
+      #   checkstyle:check -> target/checkstyle-result.xml (Fan-Out, CDAC)
+      - name: Run tests and generate metric reports
+        run: mvn -B test jacoco:report pmd:pmd checkstyle:check -Dcheckstyle.failOnViolation=false -Dpmd.failOnViolation=false
+
+      # Python-Skript parst alle XML-Reports und schreibt den Metriken-Report
+      # in den GitHub Actions Job Summary (Tab "Code Metrics" > Summary)
+      - name: Generate metrics summary
+        run: python3 scripts/metrics-summary.py
+
+      # Reports als herunterladbare Artifacts speichern
+      - name: Upload metrics artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metrics-reports
+          path: |
+            target/site/jacoco/
+            target/pmd.xml
+            target/checkstyle-result.xml
+            target/surefire-reports/
+          retention-days: 30
