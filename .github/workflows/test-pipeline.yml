@@ -113,13 +113,11 @@ jobs:
       #   pmd:pmd          -> target/pmd.xml (Kopplung + Kohaerenz)
       #   checkstyle:check -> target/checkstyle-result.xml (Fan-Out, CDAC)
       #
-      # -Dmaven.compiler.release=21: JaCoCo 0.8.12 unterstuetzt Java 25-Bytecode
-      #   (class file version 69) nicht; Java 21 (version 65) wird unterstuetzt.
-      #   --release=21 setzt Source, Target und Bootstrap-Classpath in einem Schritt
-      #   und ist zuverlaessiger als -Dsource/-Dtarget allein.
+      # pom.xml nutzt Java 21 als Compiler-Target: JaCoCo 0.8.12 unterstuetzt
+      #   Java-25-Bytecode (class file version 69) nicht, Java 21 (version 65) schon.
       # -DskipITs=true: Integrationstests nicht nochmals ausfuehren.
       - name: Run tests and generate metric reports
-        run: mvn -B verify pmd:pmd checkstyle:check -Dmaven.compiler.release=21 -DskipITs=true -Dcheckstyle.failOnViolation=false -Dpmd.failOnViolation=false
+        run: mvn -B verify pmd:pmd checkstyle:check -DskipITs=true -Dcheckstyle.failOnViolation=false -Dpmd.failOnViolation=false
 
       # Python-Skript parst alle XML-Reports und schreibt den Metriken-Report
       # in den GitHub Actions Job Summary (Tab "Code Metrics" > Summary)
