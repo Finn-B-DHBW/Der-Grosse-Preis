@@ -27,6 +27,16 @@ public class DataBase {
         this();
     }
 
+    DataBase(String dbUrl) {
+        log = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        try {
+            con = DriverManager.getConnection(dbUrl);
+            createTable();
+        } catch (Exception e) {
+            log.severe(e.getMessage());
+        }
+    }
+
     private void createTable(){
         try(Statement stmt = con.createStatement()){
             String createQuestionTable =
@@ -155,6 +165,26 @@ public class DataBase {
         }
 
         return questions.toArray(new Question[0]);
+    }
+
+    public boolean deleteQuestion(int questionId) {
+        String deleteWrongAnswers = "DELETE FROM WrongAnswer WHERE questionId = ?";
+        String deleteQuestion = "DELETE FROM Question WHERE questionId = ?";
+        try (PreparedStatement ps = con.prepareStatement(deleteWrongAnswers)) {
+            ps.setInt(1, questionId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            log.severe("Error deleting wrong answers: " + e.getMessage());
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement(deleteQuestion)) {
+            ps.setInt(1, questionId);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            log.severe("Error deleting question: " + e.getMessage());
+            return false;
+        }
     }
 
     //todo hier infos es soll nicht ausversehen eine neue category erstellt werden können durch tippfehler
