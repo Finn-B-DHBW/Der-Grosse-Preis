@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "checkstyle_configuration_1_3.dtd">
+<!--
+  Checkstyle-Konfiguration fuer OO-Metriken.
+
+  Gemessene Werte:
+
+  Metrik 1 - Kopplung (Coupling):
+    ClassFanOutComplexity:
+      Zaehlt, wie viele unterschiedliche Klassen eine Klasse referenziert
+      (in Methoden-Parametern, Rueckgabetypen, Variablen, Exceptions).
+      Schwellenwert: 20. Hoher Fan-Out = starke Kopplung.
+
+    ClassDataAbstractionCoupling (CDAC):
+      Zaehlt, wie viele unterschiedliche Klassen in Methoden instantiiert werden.
+      Nur konkrete (nicht abstrakte) Klassen werden gezaehlt.
+      Schwellenwert: 7. Misst direkte Abhaengigkeiten.
+
+  Metrik 3 - Beziehungen zwischen Klassen:
+    ClassFanOutComplexity zeigt auch die Abhaengigkeitsbeziehungen:
+      Welche Klassen "haengen von" anderen Klassen ab.
+
+    MethodCount:
+      Zaehlt die Gesamtanzahl der Methoden einer Klasse (inkl. Konstruktoren).
+      Schwellenwert: 20. Indirekt auch ein Kohärenz-Indikator.
+-->
+<module name="Checker">
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <module name="TreeWalker">
+
+        <!-- ================================================ -->
+        <!-- Metrik 1: Kopplung - Fan-Out einer Klasse        -->
+        <!-- ================================================ -->
+
+        <!--
+          ClassFanOutComplexity:
+          Misst die Anzahl der unterschiedlichen Typen (Klassen/Interfaces), die
+          eine Klasse referenziert. Gibt an, von wie vielen anderen Klassen eine
+          Klasse abhaengt (efferente Kopplung auf Klassenebene).
+          Schwellenwert: 20 (Standard-Empfehlung).
+        -->
+        <module name="ClassFanOutComplexity">
+            <property name="max" value="20"/>
+            <property name="severity" value="warning"/>
+        </module>
+
+        <!--
+          ClassDataAbstractionCoupling (CDAC):
+          Misst, wie viele unterschiedliche Datentypen in einer Klasse
+          instantiiert werden (mit 'new'). Zeigt direkte Abhaengigkeiten
+          auf Implementierungsebene.
+          Schwellenwert: 7 (Standard-Empfehlung nach Robert Martin).
+        -->
+        <module name="ClassDataAbstractionCoupling">
+            <property name="max" value="7"/>
+            <property name="severity" value="warning"/>
+        </module>
+
+        <!-- ================================================ -->
+        <!-- Metrik 3: Beziehungen - Methoden-Anzahl          -->
+        <!-- ================================================ -->
+
+        <!--
+          MethodCount:
+          Zaehlt die Gesamtanzahl der Methoden pro Klasse. Eine sehr hohe
+          Anzahl von Methoden deutet auf eine Klasse mit zu vielen
+          Verantwortlichkeiten und schwache Kohaerenz hin.
+          Schwellenwert: 20 Methoden gesamt.
+        -->
+        <module name="MethodCount">
+            <property name="maxTotal" value="20"/>
+            <property name="severity" value="warning"/>
+        </module>
+
+    </module>
+</module>
