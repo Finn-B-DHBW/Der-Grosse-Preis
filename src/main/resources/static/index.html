@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Der Große Preis</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 1. Beitritts-Seite -->
+<section id="join-section">
+    <h1>Der Große Preis</h1>
+    <input type="text" id="player-name" placeholder="Dein Name" maxlength="30" autocomplete="off">
+    <button id="join-button">Beitreten</button>
+    <p id="join-error" class="error" hidden></p>
+</section>
+
+<!-- 2. Warteraum -->
+<section id="waiting-section" hidden>
+    <h2>Warte auf die nächste Frage…</h2>
+    <p>Du spielst als <strong id="joined-name"></strong></p>
+    <p>Deine Punkte: <strong id="my-score">0</strong></p>
+    <h3>Spieler</h3>
+    <ul id="player-list"></ul>
+</section>
+
+<!-- 3. Frage -->
+<section id="question-section" hidden>
+    <p id="question-points"></p>
+    <h2 id="question-text"></h2>
+    <div id="answer-buttons"></div>
+    <p id="answer-feedback" hidden></p>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

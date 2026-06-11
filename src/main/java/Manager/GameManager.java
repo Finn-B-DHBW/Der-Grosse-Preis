@@ -1,7 +1,6 @@
 package Manager;
 
 import Connection.DataBase;
-import Connection.SocketServer;
 import Model.Player;
 import Model.Question;
 import UI.Screen.EndScreen;
@@ -11,17 +10,20 @@ import UI.Screen.QuestionScreen;
 import config.model.Category;
 import config.model.ConfigQuestion;
 import config.model.Configuration;
+import server.GameState;
+import server.GameStateListener;
+import server.GameWebSocketService;
+import server.dto.AnswerResult;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GameManager extends JFrame {
+public class GameManager extends JFrame implements GameStateListener {
     private final List<Player> playerList = new ArrayList<>();
     private int currentPlayerIndex = 0;
     private List<Question> questionList;
-    private final SocketServer serverSocket;
     private final DataBase dataBase;
     private String[] categoryList = {"SPORT", "LAND", "ESSEN", "SCHAUSPIELER", "VIDEO-SPIEL"};
     private final List<Question> answeredQuestionList;
@@ -32,7 +34,6 @@ public class GameManager extends JFrame {
     private final QuestionScreen questionScreen;
 
     public GameManager() {
-        this.serverSocket = new SocketServer(this);
         this.dataBase = new DataBase();
         this.endScreen = new EndScreen();
         this.joinScreen = new JoinScreen();
@@ -45,7 +46,40 @@ public class GameManager extends JFrame {
 //        this.setUndecorated(true); maybe later add an option to use esc button to close
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
+        GameState.getInstance().addListener(this);
+
         this.joinScreen.showJoinScreen(this);
+    }
+
+    @Override
+    public void onPlayerJoined(Player player) {
+        this.playerList.add(player);
+        this.joinScreen.refreshPlayerList(this.playerList);
+    }
+
+    @Override
+    public void onAnswerReceived(AnswerResult result) {
+        this.questionScreen.updateResultsPanel(result);
+    }
+
+    @Override
+    public void onPlayerListChanged(List<Player> players) {
+        // Punktestand hat sich geaendert; sichtbar wird das beim naechsten
+        // Wechsel auf den MainScreen, da dieser die Tabelle neu aufbaut.
+    }
+
+    public void broadcastQuestion(Question question) {
+        GameWebSocketService service = GameWebSocketService.getInstance();
+        if (service != null) {
+            service.broadcastQuestion(question);
+        }
+    }
+
+    public void broadcastQuestionClosed(Question question) {
+        GameWebSocketService service = GameWebSocketService.getInstance();
+        if (service != null) {
+            service.broadcastQuestionClosed(question);
+        }
     }
 
     public void setQuestions() {
@@ -139,10 +173,6 @@ public class GameManager extends JFrame {
         this.getContentPane().repaint();
     }
 
-    public void answerQuestion(Question question, String name){
-        //todo check if question is right or wrong
-    }
-
     public String[] getCategoryList() {
         return categoryList;
     }
@@ -157,10 +187,6 @@ public class GameManager extends JFrame {
 
     public List<Question> getQuestionList() {
         return questionList;
-    }
-
-    public SocketServer getServerSocket() {
-        return serverSocket;
     }
 
     public EndScreen getEndScreen() {
