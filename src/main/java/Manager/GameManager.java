@@ -1,6 +1,7 @@
 package Manager;
 
 import Connection.DataBase;
+import Connection.QuestionSeeder;
 import Model.Player;
 import Model.Question;
 import UI.Screen.EndScreen;
@@ -17,6 +18,8 @@ import server.dto.AnswerResult;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +38,7 @@ public class GameManager extends JFrame implements GameStateListener {
 
     public GameManager() {
         this.dataBase = new DataBase();
+        QuestionSeeder.seedIfEmpty(this.dataBase);
         this.endScreen = new EndScreen();
         this.joinScreen = new JoinScreen();
         this.mainScreen = new MainScreen();
@@ -84,15 +88,33 @@ public class GameManager extends JFrame implements GameStateListener {
 
     public void setQuestions() {
         this.questionList = new ArrayList<>();
+        this.answeredQuestionList.clear();
+
+        String[] allCategories = dataBase.getCategories();
+        String[] selectedCategories;
+
+        if (allCategories.length >= 5) {
+            List<String> shuffled = new ArrayList<>(Arrays.asList(allCategories));
+            Collections.shuffle(shuffled);
+            selectedCategories = shuffled.subList(0, 5).toArray(new String[0]);
+        } else if (allCategories.length > 0) {
+            selectedCategories = allCategories;
+        } else {
+            selectedCategories = categoryList;
+        }
+        this.categoryList = selectedCategories;
+
+        int[] pointValues = {100, 200, 300, 400, 500};
         int questionId = 1;
-        for (String category : categoryList) {
-            for (int j = 1; j <= 5; j++) {
-                this.questionList.add(new Question("TEST QUESTIONmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm", category, "RIGHT ANSWER",
-                        new String[]{"WRONG ANSWER 1", "WRONG ANSWER 2", "WRONG ANSWER 3"}, j * 10, questionId));
-                questionId++;
+        for (String category : selectedCategories) {
+            Question[] drawn = dataBase.getRandomQuestionsFromCategory(category, 5);
+            for (int i = 0; i < drawn.length && i < pointValues.length; i++) {
+                Question q = drawn[i];
+                this.questionList.add(new Question(
+                        q.getQuestionText(), q.getCategory(), q.getRightAnswer(),
+                        q.getWrongAnswers(), pointValues[i], questionId++));
             }
         }
-        this.answeredQuestionList.clear();
     }
 
     public void loadConfiguration(Configuration configuration) {

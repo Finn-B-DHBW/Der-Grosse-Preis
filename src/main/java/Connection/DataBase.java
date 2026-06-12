@@ -187,6 +187,51 @@ public class DataBase {
         }
     }
 
+    public boolean hasSeedData() {
+        try (Statement stmt = con.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Question");
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            log.severe(e.getMessage());
+        }
+        return false;
+    }
+
+    public Question[] getRandomQuestionsFromCategory(String category, int limit) {
+        ArrayList<Question> questions = new ArrayList<>();
+        String sql = "SELECT questionText, category, rightAnswer, score, questionId FROM Question WHERE category = ? ORDER BY RANDOM() LIMIT ?";
+        try (PreparedStatement prep = con.prepareStatement(sql)) {
+            prep.setString(1, category);
+            prep.setInt(2, limit);
+            ResultSet rs = prep.executeQuery();
+            while (rs.next()) {
+                questions.add(new Question(rs.getString("questionText"), rs.getString("category"), rs.getString("rightAnswer"), rs.getInt("score"), rs.getInt("questionId")));
+            }
+        } catch (SQLException e) {
+            log.severe(e.getMessage());
+            return new Question[0];
+        }
+
+        String selectWrongAnswers = "SELECT wrongAnswerText FROM WrongAnswer WHERE questionId = ?";
+        for (Question question : questions) {
+            try (PreparedStatement prep = con.prepareStatement(selectWrongAnswers)) {
+                prep.setInt(1, question.getQuestionId());
+                ResultSet rs = prep.executeQuery();
+                ArrayList<String> wrongAnswerTexts = new ArrayList<>();
+                while (rs.next()) {
+                    wrongAnswerTexts.add(rs.getString("wrongAnswerText"));
+                }
+                question.setWrongAnswers(wrongAnswerTexts.toArray(new String[0]));
+            } catch (SQLException e) {
+                log.severe(e.getMessage());
+                return new Question[0];
+            }
+        }
+        return questions.toArray(new Question[0]);
+    }
+
     //todo hier infos es soll nicht ausversehen eine neue category erstellt werden können durch tippfehler
     public String[] getCategories(){
         try(Statement stmt = con.createStatement()){
