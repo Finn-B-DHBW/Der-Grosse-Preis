@@ -51,6 +51,34 @@ public class CategoryController
         addQuestionPanels(list);
     }
 
+    /**
+     * Returns true if every question that has any content also has a correct answer selected.
+     * Empty question slots (all fields blank) are skipped.
+     */
+    public boolean validateCorrectAnswers() {
+        JPanel container = categoryPanel.getQuestionsContainer();
+        for (java.awt.Component c : container.getComponents()) {
+            if (c instanceof QuestionPanel qp) {
+                if (qp.hasAnyContent() && !qp.hasCorrectAnswerSelected()) return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Force-flushes all QuestionPanel text fields to their models.
+     * Must be called before navigating away from the CategoryPanel so data is
+     * persisted even when Swing does not fire focusLost on CardLayout switches.
+     */
+    public void saveAll() {
+        JPanel container = categoryPanel.getQuestionsContainer();
+        for (java.awt.Component c : container.getComponents()) {
+            if (c instanceof QuestionPanel qp) {
+                qp.saveAll();
+            }
+        }
+    }
+
     public void populateFromCategory(Category category) {
         if (category == null) return;
         List<QuestionPanel> panels = new ArrayList<>();

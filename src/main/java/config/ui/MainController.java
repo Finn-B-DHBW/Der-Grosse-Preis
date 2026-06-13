@@ -32,6 +32,8 @@ public class MainController {
         configuratorController = new ConfiguratorController(configuratorPanel, mainView, configurationPanel, configuratorOverview, configurationController);
         categoryController = new CategoryController(categoryPanel, mainView, configuratorOverview);
 
+        configurationController.setOnDoneCallback(configuratorController::refreshConfigurationList);
+
         mainView.showPage(configuratorPanel);
 
         mainView.setVisible(true);

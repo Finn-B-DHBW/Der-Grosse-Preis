@@ -45,6 +45,10 @@ public class CategoryExpandablePanel extends JPanel {
         right.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
         right.add(editButton);
         header.add(right, BorderLayout.EAST);
+        // CENTER spacer: ensures EAST always gets its preferred width on narrow windows
+        JPanel centerSpacer = new JPanel();
+        centerSpacer.setOpaque(false);
+        header.add(centerSpacer, BorderLayout.CENTER);
         add(header, BorderLayout.NORTH);
 
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -89,7 +93,12 @@ public class CategoryExpandablePanel extends JPanel {
         revalidate();
         repaint();
         Container p = getParent();
-        if (p != null) { p.revalidate(); p.repaint(); }
+        while (p != null) {
+            p.revalidate();
+            p.repaint();
+            if (p instanceof JScrollPane) break;
+            p = p.getParent();
+        }
     }
 
     private void updateToggleGlyph() {
@@ -102,12 +111,14 @@ public class CategoryExpandablePanel extends JPanel {
             int btnH = toggleButton.getPreferredSize().height;
             int padding = 3;
             int h = Math.max(headerH, btnH) + padding;
-            Dimension pref = new Dimension(Integer.MAX_VALUE, h);
-            Dimension min = new Dimension(0, h);
-            Dimension max = new Dimension(Integer.MAX_VALUE, h);
-            setPreferredSize(pref);
-            setMinimumSize(min);
-            setMaximumSize(max);
+            // Do NOT set preferred width to Integer.MAX_VALUE — that causes the scroll
+            // pane viewport to render the panel billions of pixels wide, pushing EAST
+            // components (bearbeiten button) off-screen. Leave preferredSize null so the
+            // natural header width is used; BoxLayout Y_AXIS still stretches each child
+            // to the container width via maxWidth = Integer.MAX_VALUE.
+            setPreferredSize(null);
+            setMinimumSize(new Dimension(0, h));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, h));
         } else {
             setPreferredSize(null);
             setMinimumSize(null);

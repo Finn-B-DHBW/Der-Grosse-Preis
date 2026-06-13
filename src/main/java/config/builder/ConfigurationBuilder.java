@@ -10,9 +10,28 @@ public class ConfigurationBuilder {
         return new ConfigurationBuilder();
     }
 
+    public static ConfigurationBuilder fromExisting(Configuration existing) {
+        return new ConfigurationBuilder(existing);
+    }
+
     private ConfigurationBuilder() {
         this.configuration = new Configuration("");
         this.categoryBuilder = new CategoryBuilder(configuration, 5);
+    }
+
+    private ConfigurationBuilder(Configuration existing) {
+        this.configuration = existing;
+        int questionsPerCategory = 5;
+        if (existing.getCategories() != null && !existing.getCategories().isEmpty()) {
+            int max = 0;
+            for (config.model.Category cat : existing.getCategories()) {
+                if (cat.getPointQuestionMap() != null) {
+                    max = Math.max(max, cat.getPointQuestionMap().size());
+                }
+            }
+            if (max > 0) questionsPerCategory = max;
+        }
+        this.categoryBuilder = new CategoryBuilder(configuration, questionsPerCategory);
     }
 
     public void setTitle(String title) {

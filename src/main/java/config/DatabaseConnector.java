@@ -57,11 +57,12 @@ public class DatabaseConnector {
             ensureTables(con);
 
             try (Statement stmt = con.createStatement();
-                 ResultSet rs = stmt.executeQuery("SELECT configId, title FROM Configuration")) {
+                 ResultSet rs = stmt.executeQuery("SELECT configId, title FROM Configuration ORDER BY configId")) {
                 while (rs.next()) {
                     int configId = rs.getInt("configId");
                     String title = rs.getString("title");
                     Configuration config = new Configuration(title);
+                    config.setConfigId(configId);
 
                     List<Category> categories = loadCategories(con, configId);
                     for (Category cat : categories) {
@@ -122,6 +123,7 @@ public class DatabaseConnector {
             con.setAutoCommit(false);
 
             int configId = insertConfiguration(con, configuration);
+            configuration.setConfigId(configId);
             for (Category cat : configuration.getCategories()) {
                 int categoryId = insertCategory(con, configId, cat);
                 for (Map.Entry<Integer, ConfigQuestion> entry : cat.getPointQuestionMap().entrySet()) {
@@ -133,6 +135,35 @@ public class DatabaseConnector {
             log.info("Configuration saved successfully: " + configuration.getTitle());
         } catch (SQLException e) {
             log.severe("Error saving configuration: " + e.getMessage());
+        }
+    }
+
+    public static void deleteConfiguration(int configId) {
+        try (Connection con = getConnection()) {
+            ensureTables(con);
+            con.setAutoCommit(false);
+
+            try (PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM ConfigQuestionEntry WHERE categoryId IN " +
+                    "(SELECT categoryId FROM ConfigCategory WHERE configId = ?)")) {
+                ps.setInt(1, configId);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM ConfigCategory WHERE configId = ?")) {
+                ps.setInt(1, configId);
+                ps.executeUpdate();
+            }
+            try (PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM Configuration WHERE configId = ?")) {
+                ps.setInt(1, configId);
+                ps.executeUpdate();
+            }
+
+            con.commit();
+            log.info("Configuration deleted: id=" + configId);
+        } catch (SQLException e) {
+            log.severe("Error deleting configuration: " + e.getMessage());
         }
     }
 

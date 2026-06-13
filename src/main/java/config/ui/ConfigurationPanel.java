@@ -11,20 +11,27 @@ public class ConfigurationPanel extends JPanel {
     private JSpinner spinnerNumberOfQuestions;
 
     private final JTextField textFieldCategoryName = new JTextField(20);
-    private final JButton buttonAddCategory = new JButton("hinzufügen");
+    private final JButton buttonAddCategory    = new JButton("hinzufügen");
+    private final JButton buttonAutoGenerate   = new JButton("Auto-generieren");
 
+    private final JLabel labelTitle = new JLabel("Neue Konfiguration");
     private final JLabel labelCategories = new JLabel("Kategorien");
     private final JPanel panelCategoryButtons = new JPanel();
 
-    private final JButton buttonDone = new JButton("Fertig");
+    private final JButton buttonSave   = new JButton("Speichern");
+    private final JButton buttonCancel = new JButton("Abbrechen");
+
+    private static final int DEFAULT_QUESTIONS_PER_CATEGORY = 5;
 
     public JTextField getTextFieldConfigurationTitle() { return textFieldConfigurationTitle; }
     public JFormattedTextField getTextFieldNumberOfQuestions() { return textFieldNumberOfQuestions; }
     public JSpinner getSpinnerNumberOfQuestions() { return spinnerNumberOfQuestions; }
     public JTextField getTextFieldCategoryName() { return textFieldCategoryName; }
-    public JButton getButtonAddCategory() { return buttonAddCategory; }
+    public JButton getButtonAddCategory()  { return buttonAddCategory; }
+    public JButton getButtonAutoGenerate() { return buttonAutoGenerate; }
     public JPanel getPanelCategoryButtons() { return panelCategoryButtons; }
-    public JButton getButtonDone() { return buttonDone; }
+    public JButton getButtonSave()   { return buttonSave; }
+    public JButton getButtonCancel() { return buttonCancel; }
 
     public ConfigurationPanel() {
         setLayout(new BorderLayout());
@@ -39,8 +46,27 @@ public class ConfigurationPanel extends JPanel {
     private JPanel Header()
     {
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Neue Konfiguration"));
+        panel.add(labelTitle);
         return  panel;
+    }
+
+    public void setHeaderTitle(String title) {
+        labelTitle.setText(title);
+    }
+
+    public void clearForNew() {
+        labelTitle.setText("Neue Konfiguration");
+        textFieldConfigurationTitle.setText("");
+        spinnerNumberOfQuestions.setValue(DEFAULT_QUESTIONS_PER_CATEGORY);
+        textFieldCategoryName.setText("");
+        clearCategoryArea();
+    }
+
+    public void clearCategoryArea() {
+        panelCategoryButtons.removeAll();
+        panelCategoryButtons.add(labelCategories);
+        panelCategoryButtons.revalidate();
+        panelCategoryButtons.repaint();
     }
 
     private JPanel Center(){
@@ -72,23 +98,35 @@ public class ConfigurationPanel extends JPanel {
         panelAddCategory.add(new JLabel("Neue Kategorie: "));
         panelAddCategory.add(textFieldCategoryName);
         panelAddCategory.add(buttonAddCategory);
+        panelAddCategory.add(buttonAutoGenerate);
         panel.add(panelAddCategory);
 
         return  panel;
     }
 
-    private JPanel CategoryButtons()
+    private JComponent CategoryButtons()
     {
         panelCategoryButtons.setLayout(new BoxLayout(panelCategoryButtons, BoxLayout.Y_AXIS));
         panelCategoryButtons.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
+        panelCategoryButtons.setAlignmentX(LEFT_ALIGNMENT);
         panelCategoryButtons.add(labelCategories);
-        return  panelCategoryButtons;
+
+        JPanel scrollableWrapper = new JPanel(new BorderLayout());
+        scrollableWrapper.add(panelCategoryButtons, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(scrollableWrapper,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        return  scrollPane;
     }
 
     private JPanel Footer(){
-        JPanel panel = new JPanel();
-        panel.add(buttonDone);
-        return  panel;
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+        panel.add(buttonSave);
+        panel.add(buttonCancel);
+        return panel;
     }
 
     private void InitNumberOfQuestionsField()

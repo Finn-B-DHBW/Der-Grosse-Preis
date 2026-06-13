@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseWheelEvent;
 
 public class QuestionPanel extends JPanel {
 
@@ -98,6 +99,24 @@ public class QuestionPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(area,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // Disable wheel scrolling on inner scroll panes so the event is not consumed here.
+        scroll.setWheelScrollingEnabled(false);
+        // Wheel events dispatched to the JTextArea itself are NOT automatically bubbled
+        // by Swing when the inner JScrollPane is present. Re-dispatch them explicitly to
+        // the next ancestor JScrollPane (the outer questionsScroll in CategoryPanel).
+        area.addMouseWheelListener(e -> {
+            JScrollPane inner = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, area);
+            JScrollPane outer = (inner == null) ? null
+                    : (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, inner);
+            if (outer == null) return;
+            // 14-param constructor: source, id, when, modifiers, x, y, xAbs, yAbs,
+            //   clickCount, popupTrigger, scrollType, scrollAmount, wheelRotation, preciseWheelRotation
+            outer.dispatchEvent(new MouseWheelEvent(
+                    outer, e.getID(), e.getWhen(), e.getModifiersEx(),
+                    0, 0, 0, 0, e.getClickCount(), e.isPopupTrigger(),
+                    e.getScrollType(), e.getScrollAmount(), e.getWheelRotation(),
+                    e.getPreciseWheelRotation()));
+        });
         enforceTwoRowViewport(area, scroll);
         return scroll;
     }
@@ -138,6 +157,36 @@ public class QuestionPanel extends JPanel {
         for (int i = 0; i < ANSWER_COUNT; i++) {
             final int index = i;
             correctCheckBoxes[i].addActionListener(e -> handleCheckboxChange(index));
+        }
+    }
+
+    /** Returns true if the question or any answer has non-blank text. */
+    public boolean hasAnyContent() {
+        if (textAreaQuestion.getText() != null && !textAreaQuestion.getText().isBlank()) return true;
+        for (JTextArea area : answerAreas) {
+            if (area.getText() != null && !area.getText().isBlank()) return true;
+        }
+        return false;
+    }
+
+    /** Returns true if exactly one answer checkbox is selected. */
+    public boolean hasCorrectAnswerSelected() {
+        for (JCheckBox cb : correctCheckBoxes) {
+            if (cb.isSelected()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Explicitly flush all text-field values to the model.
+     * Call this before navigating away so the data is saved even when
+     * focusLost does not fire (e.g. CardLayout panel switch).
+     */
+    public void saveAll() {
+        if (questionModel == null) return;
+        questionModel.setQuestion(textAreaQuestion.getText());
+        for (int i = 0; i < ANSWER_COUNT; i++) {
+            questionModel.setAnswer(i, answerAreas[i].getText());
         }
     }
 
