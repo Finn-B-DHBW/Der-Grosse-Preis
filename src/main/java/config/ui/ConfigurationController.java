@@ -50,7 +50,7 @@ public class ConfigurationController
         suppressSpinnerListener = true;
         try {
             configurationPanel.clearForNew();
-            configurationPanel.setHeaderTitle("Neue Konfiguration");
+            configurationPanel.setHeaderTitle("Neues Spiel");
         } finally {
             suppressSpinnerListener = false;
         }
@@ -66,7 +66,7 @@ public class ConfigurationController
         suppressSpinnerListener = true;
         try {
             configurationPanel.clearForNew();
-            configurationPanel.setHeaderTitle("Konfiguration bearbeiten");
+            configurationPanel.setHeaderTitle("Spiel bearbeiten");
             configurationPanel.getTextFieldConfigurationTitle().setText(
                     config.getTitle() == null ? "" : config.getTitle());
             configurationPanel.getSpinnerNumberOfQuestions().setValue(questionsPerCategory);
@@ -378,7 +378,17 @@ public class ConfigurationController
         CategoryExpandablePanel exp = new CategoryExpandablePanel(lastCategory);
         exp.setCategoryName(categoryName);
         exp.getEditButton().addActionListener(evt -> mainView.showPage(categoryPanel));
-        categoryPanel.getButtonDone().addActionListener(evt -> {
+        exp.getDeleteButton().addActionListener(evt -> {
+            int ok = JOptionPane.showConfirmDialog(configurationPanel,
+                    "Kategorie \"" + exp.getCategoryName() + "\" wirklich löschen?",
+                    "Kategorie löschen", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (ok != JOptionPane.YES_OPTION) return;
+            if (hasBuilder()) configuratorOverview.configurationBuilder
+                    .getConfiguration().getCategories().remove(lastCategory);
+            JPanel cb = configurationPanel.getPanelCategoryButtons();
+            cb.remove(exp); cb.revalidate(); cb.repaint();
+        });
+        categoryPanel.getButtonSave().addActionListener(evt -> {
             categoryController.saveAll();
             if (!categoryController.validateCorrectAnswers()) {
                 JOptionPane.showMessageDialog(categoryPanel,
@@ -390,6 +400,7 @@ public class ConfigurationController
             exp.rebuildContent();
             mainView.showPage(configurationPanel);
         });
+        categoryPanel.getButtonCancel().addActionListener(evt -> mainView.showPage(configurationPanel));
 
         JPanel categoryButtons = configurationPanel.getPanelCategoryButtons();
         categoryButtons.add(exp);
@@ -413,7 +424,17 @@ public class ConfigurationController
         CategoryExpandablePanel exp = new CategoryExpandablePanel(cat);
         exp.setCategoryName(name);
         exp.getEditButton().addActionListener(evt -> mainView.showPage(categoryPanel));
-        categoryPanel.getButtonDone().addActionListener(evt -> {
+        exp.getDeleteButton().addActionListener(evt -> {
+            int ok = JOptionPane.showConfirmDialog(configurationPanel,
+                    "Kategorie \"" + exp.getCategoryName() + "\" wirklich löschen?",
+                    "Kategorie löschen", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (ok != JOptionPane.YES_OPTION) return;
+            if (hasBuilder()) configuratorOverview.configurationBuilder
+                    .getConfiguration().getCategories().remove(cat);
+            JPanel cb = configurationPanel.getPanelCategoryButtons();
+            cb.remove(exp); cb.revalidate(); cb.repaint();
+        });
+        categoryPanel.getButtonSave().addActionListener(evt -> {
             categoryController.saveAll();
             if (!categoryController.validateCorrectAnswers()) {
                 JOptionPane.showMessageDialog(categoryPanel,
@@ -425,6 +446,7 @@ public class ConfigurationController
             exp.rebuildContent();
             mainView.showPage(configurationPanel);
         });
+        categoryPanel.getButtonCancel().addActionListener(evt -> mainView.showPage(configurationPanel));
 
         JPanel categoryButtons = configurationPanel.getPanelCategoryButtons();
         categoryButtons.add(exp);

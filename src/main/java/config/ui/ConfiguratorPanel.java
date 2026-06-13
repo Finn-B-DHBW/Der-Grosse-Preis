@@ -30,12 +30,12 @@ public class ConfiguratorPanel extends JPanel {
             BorderFactory.createLineBorder(new Color(180, 180, 180), 1);
 
     // ── Sizing constants ──────────────────────────────────────────────────────
-    private static final int   CONFIG_BTN_HEIGHT = 40;
-    private static final int   ACTION_BTN_WIDTH  = 190;
-    private static final int   ACTION_BTN_HEIGHT = 40;
+    private static final int   CONFIG_BTN_HEIGHT = 52;
+    private static final int   ACTION_BTN_WIDTH  = 220;
+    private static final int   ACTION_BTN_HEIGHT = 52;
     private static final int   ACTION_GAP        = 10;
-    private static final float FONT_NORMAL       = 13f;
-    private static final float FONT_HEADER_BTN   = 15f;
+    private static final float FONT_NORMAL       = 16f;
+    private static final float FONT_HEADER_BTN   = 17f;
 
     // ── Public API ────────────────────────────────────────────────────────────
     public JButton getButtonCreate()              { return buttonCreate; }
@@ -58,7 +58,7 @@ public class ConfiguratorPanel extends JPanel {
     // ── Header ────────────────────────────────────────────────────────────────
     // Full-width "Neue Konfiguration erstellen" button, bold, slightly taller
     private JPanel buildHeader() {
-        buttonCreate = new JButton("+ Neue Konfiguration erstellen");
+        buttonCreate = new JButton("+ Neues Spiel erstellen");
         buttonCreate.setFont(buttonCreate.getFont().deriveFont(Font.BOLD, FONT_HEADER_BTN));
         buttonCreate.setFocusPainted(false);
         buttonCreate.setPreferredSize(new Dimension(0, 50));
@@ -82,7 +82,7 @@ public class ConfiguratorPanel extends JPanel {
     private JPanel buildConfigList() {
         JPanel panel = new JPanel(new BorderLayout(0, 8));
 
-        JLabel header = new JLabel("Konfigurationen");
+        JLabel header = new JLabel("Spiele");
         header.setFont(header.getFont().deriveFont(Font.BOLD, FONT_NORMAL));
         panel.add(header, BorderLayout.NORTH);
 
@@ -108,11 +108,6 @@ public class ConfiguratorPanel extends JPanel {
         buttonDuplicate = makeActionButton("Duplizieren");
         buttonDelete    = makeActionButton("Löschen");
 
-        // Section header (aligns visually with "Konfigurationen" on the left)
-        JLabel header = new JLabel("Aktionen");
-        header.setFont(header.getFont().deriveFont(Font.BOLD, FONT_NORMAL));
-        header.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         // GridLayout: all three cells always identical in size
         JPanel grid = new JPanel(new GridLayout(3, 1, 0, ACTION_GAP));
         grid.add(buttonEdit);
@@ -120,10 +115,14 @@ public class ConfiguratorPanel extends JPanel {
         grid.add(buttonDelete);
         grid.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Stack header + buttons at top; glue absorbs remaining vertical space
+        // Invisible spacer matching the "Spiele" header label height + gap on the left
+        JLabel spacer = new JLabel(" ");
+        spacer.setFont(spacer.getFont().deriveFont(Font.BOLD, FONT_NORMAL));
+        spacer.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JPanel inner = new JPanel();
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-        inner.add(header);
+        inner.add(spacer);
         inner.add(Box.createRigidArea(new Dimension(0, 8)));
         inner.add(grid);
         inner.add(Box.createVerticalGlue());
@@ -139,6 +138,7 @@ public class ConfiguratorPanel extends JPanel {
         JButton btn = new JButton(text);
         btn.setFont(btn.getFont().deriveFont(Font.PLAIN, FONT_NORMAL));
         btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(ACTION_BTN_WIDTH, ACTION_BTN_HEIGHT));
         return btn;
     }
 
@@ -154,7 +154,7 @@ public class ConfiguratorPanel extends JPanel {
         if (configurations != null) {
             for (Configuration cfg : configurations) {
                 String label = (cfg.getTitle() == null || cfg.getTitle().isBlank())
-                        ? "Konfiguration " + cfg.getConfigId()
+                        ? "Spiel " + cfg.getConfigId()
                         : cfg.getTitle();
 
                 JButton btn = new JButton(label);

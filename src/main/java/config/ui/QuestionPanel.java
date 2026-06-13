@@ -10,107 +10,154 @@ import java.awt.event.MouseWheelEvent;
 
 public class QuestionPanel extends JPanel {
 
-    private static final int ANSWER_COUNT = 3;
-    private static final int TEXT_ROWS = 2;
-    private static final int TEXT_COLS = 20;
+    private static final int   ANSWER_COUNT  = 3;
+    private static final int   TEXT_ROWS     = 2;
+    private static final int   TEXT_COLS     = 24;
+    private static final float FONT_HEADER   = 15f;   // "X Punkte" block header
+    private static final float FONT_LABEL    = 18f;   // row labels (?, a), b), c), "richtig?")
+    private static final float FONT_AREA     = 14f;   // text area content
+    private static final Color HDR_BG        = new Color(237, 242, 250);
+    private static final Color HDR_BORDER    = new Color(200, 215, 240);
+    private static final Color HDR_FG        = new Color(30, 60, 120);
 
-    private final Integer pointsValue;
+    // Labels for answer rows: a), b), c)
+    private static final String[] ANSWER_LABELS = {"a)", "b)", "c)"};
+
+    private final Integer       pointsValue;
     private final ConfigQuestion questionModel;
     private boolean suppressCheckboxEvents = false;
 
-    private final JTextArea textAreaQuestion = new JTextArea(TEXT_ROWS, TEXT_COLS);
-    private final JTextArea[] answerAreas = new JTextArea[ANSWER_COUNT];
-    private final JCheckBox[] correctCheckBoxes = new JCheckBox[ANSWER_COUNT];
+    private final JTextArea   textAreaQuestion             = new JTextArea(TEXT_ROWS, TEXT_COLS);
+    private final JTextArea[] answerAreas                  = new JTextArea[ANSWER_COUNT];
+    private final JCheckBox[] correctCheckBoxes            = new JCheckBox[ANSWER_COUNT];
 
     public QuestionPanel() {
         this(null, null);
     }
 
     public QuestionPanel(Integer points, ConfigQuestion question) {
-        this.pointsValue = points;
+        this.pointsValue   = points;
         this.questionModel = question;
         for (int i = 0; i < ANSWER_COUNT; i++) {
-            answerAreas[i] = new JTextArea(TEXT_ROWS, TEXT_COLS);
+            answerAreas[i]       = new JTextArea(TEXT_ROWS, TEXT_COLS);
             correctCheckBoxes[i] = new JCheckBox("");
+            // FlatLaf: scale checkbox icon per component
+            correctCheckBoxes[i].putClientProperty("FlatLaf.style",
+                    "icon.width: 22; icon.height: 22");
         }
-
         buildLayout();
         populateFromModel();
         attachAutosaveListeners();
         attachCorrectAnswerBinding();
     }
 
+    // ── Layout ────────────────────────────────────────────────────────────────
     private void buildLayout() {
         setLayout(new GridBagLayout());
+        // No separator line — extra top padding creates visual breathing room between blocks
+        setBorder(BorderFactory.createEmptyBorder(14, 14, 10, 14));
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(2, 0, 2, 0);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
         addHeader(gbc);
+
         enableLineWrap(textAreaQuestion);
-        for (JTextArea area : answerAreas) enableLineWrap(area);
+        for (JTextArea a : answerAreas) enableLineWrap(a);
 
-        addLabeledTextRow("Frage", textAreaQuestion, 1, gbc, "richtig?");
-        for (int i = 0; i < ANSWER_COUNT; i++) {
-            addAnswerRow(i, gbc);
-        }
-
-        setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+        // Row 1: Frage — "?" label, text area, "richtig?" trailing header (centered in col)
+        addQuestionRow(gbc);
+        // Rows 2-4: Answers — a) b) c) labels, text areas, checkboxes
+        for (int i = 0; i < ANSWER_COUNT; i++) addAnswerRow(i, gbc);
     }
 
     private void addHeader(GridBagConstraints gbc) {
-        String headerText = (pointsValue != null ? pointsValue + " Punkte" : "Punkte");
-        JLabel header = new JLabel(headerText);
-        header.setFont(header.getFont().deriveFont(Font.BOLD));
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 3; gbc.weightx = 1.0;
-        add(header, gbc);
-        gbc.gridwidth = 1;
+        String text = (pointsValue != null ? pointsValue + " Punkte" : "Punkte");
+        JLabel lbl  = new JLabel(text);
+        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, FONT_HEADER));
+        lbl.setForeground(HDR_FG);
+
+        JPanel hdr = new JPanel(new BorderLayout());
+        hdr.setBackground(HDR_BG);
+        hdr.setOpaque(true);
+        hdr.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(HDR_BORDER, 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        hdr.add(lbl, BorderLayout.WEST);
+
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 3;
+        gbc.weightx = 1.0; gbc.insets = new Insets(0, 0, 8, 0);
+        add(hdr, gbc);
+        gbc.gridwidth = 1; gbc.weightx = 0;
     }
 
-    private void addLabeledTextRow(String labelText, JTextArea area, int row,
-                                    GridBagConstraints gbc, String trailingHeader) {
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.0; gbc.fill = GridBagConstraints.NONE;
-        add(new JLabel(labelText), gbc);
+    private void addQuestionRow(GridBagConstraints gbc) {
+        // "?" label
+        JLabel qLbl = makeLabel("?");
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE; gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(4, 2, 4, 16);
+        add(qLbl, gbc);
 
-        JScrollPane scroll = wrapInScrollPane(area);
-        gbc.gridx = 1; gbc.gridy = row; gbc.weightx = 1.0; gbc.fill = GridBagConstraints.BOTH;
+        // Text area
+        JScrollPane scroll = wrapInScrollPane(textAreaQuestion);
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH; gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(4, 0, 4, 6);
         add(scroll, gbc);
 
-        gbc.gridx = 2; gbc.gridy = row; gbc.weightx = 0.0; gbc.fill = GridBagConstraints.NONE;
-        add(new JLabel(trailingHeader), gbc);
+        // "✔" header — centered in its column
+        JLabel trail = makeLabel("✔");
+        gbc.gridx = 2; gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE; gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(4, 4, 4, 2);
+        add(trail, gbc);
     }
 
     private void addAnswerRow(int index, GridBagConstraints gbc) {
         int row = 2 + index;
-        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.0; gbc.fill = GridBagConstraints.NONE;
-        add(new JLabel("Antwort " + (index + 1)), gbc);
 
+        // a) / b) / c) label
+        JLabel lbl = makeLabel(ANSWER_LABELS[index]);
+        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE; gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(4, 2, 4, 16);
+        add(lbl, gbc);
+
+        // Text area
         JScrollPane scroll = wrapInScrollPane(answerAreas[index]);
-        gbc.gridx = 1; gbc.gridy = row; gbc.weightx = 1.0; gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH; gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(4, 0, 4, 6);
         add(scroll, gbc);
 
-        gbc.gridx = 2; gbc.gridy = row; gbc.weightx = 0.0; gbc.fill = GridBagConstraints.NONE;
+        // Checkbox — centered under "richtig?"
+        gbc.gridx = 2; gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE; gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(4, 4, 4, 2);
         add(correctCheckBoxes[index], gbc);
     }
 
+    private JLabel makeLabel(String text) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, FONT_LABEL));
+        return lbl;
+    }
+
+    // ── Scroll-pane wrapper ───────────────────────────────────────────────────
     private JScrollPane wrapInScrollPane(JTextArea area) {
         area.setRows(TEXT_ROWS);
+        area.setFont(area.getFont().deriveFont(FONT_AREA));
         JScrollPane scroll = new JScrollPane(area,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        // Disable wheel scrolling on inner scroll panes so the event is not consumed here.
         scroll.setWheelScrollingEnabled(false);
-        // Wheel events dispatched to the JTextArea itself are NOT automatically bubbled
-        // by Swing when the inner JScrollPane is present. Re-dispatch them explicitly to
-        // the next ancestor JScrollPane (the outer questionsScroll in CategoryPanel).
         area.addMouseWheelListener(e -> {
             JScrollPane inner = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, area);
             JScrollPane outer = (inner == null) ? null
                     : (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, inner);
             if (outer == null) return;
-            // 14-param constructor: source, id, when, modifiers, x, y, xAbs, yAbs,
-            //   clickCount, popupTrigger, scrollType, scrollAmount, wheelRotation, preciseWheelRotation
             outer.dispatchEvent(new MouseWheelEvent(
                     outer, e.getID(), e.getWhen(), e.getModifiersEx(),
                     0, 0, 0, 0, e.getClickCount(), e.isPopupTrigger(),
@@ -121,26 +168,38 @@ public class QuestionPanel extends JPanel {
         return scroll;
     }
 
+    // ── Helpers ───────────────────────────────────────────────────────────────
     private static void enableLineWrap(JTextArea area) {
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
     }
 
+    private static void enforceTwoRowViewport(JTextArea area, JScrollPane scroll) {
+        if (area == null || scroll == null) return;
+        int rows     = Math.max(TEXT_ROWS, area.getRows());
+        area.setRows(rows);
+        FontMetrics fm   = area.getFontMetrics(area.getFont());
+        int lineH        = (fm != null) ? fm.getHeight() : Math.max(14, area.getPreferredSize().height);
+        Insets in        = area.getInsets();
+        int contentH     = (lineH * rows) + (in != null ? in.top + in.bottom : 0);
+        area.setMinimumSize(new Dimension(100, contentH));
+        Dimension spPref = new Dimension(200, contentH + 4);
+        scroll.setMinimumSize(spPref);
+        scroll.setPreferredSize(spPref);
+    }
+
+    // ── Autosave listeners ────────────────────────────────────────────────────
     private void attachAutosaveListeners() {
         textAreaQuestion.addFocusListener(new FocusAdapter() {
             @Override public void focusLost(FocusEvent e) {
-                if (questionModel != null) {
-                    questionModel.setQuestion(textAreaQuestion.getText());
-                }
+                if (questionModel != null) questionModel.setQuestion(textAreaQuestion.getText());
             }
         });
         for (int i = 0; i < ANSWER_COUNT; i++) {
-            final int index = i;
+            final int idx = i;
             answerAreas[i].addFocusListener(new FocusAdapter() {
                 @Override public void focusLost(FocusEvent e) {
-                    if (questionModel != null) {
-                        questionModel.setAnswer(index, answerAreas[index].getText());
-                    }
+                    if (questionModel != null) questionModel.setAnswer(idx, answerAreas[idx].getText());
                 }
             });
         }
@@ -149,56 +208,11 @@ public class QuestionPanel extends JPanel {
     private void attachCorrectAnswerBinding() {
         int selected = (questionModel != null) ? questionModel.getCorrectAnswer() : 0;
         suppressCheckboxEvents = true;
-        for (int i = 0; i < ANSWER_COUNT; i++) {
-            correctCheckBoxes[i].setSelected(selected == i + 1);
-        }
+        for (int i = 0; i < ANSWER_COUNT; i++) correctCheckBoxes[i].setSelected(selected == i + 1);
         suppressCheckboxEvents = false;
-
         for (int i = 0; i < ANSWER_COUNT; i++) {
-            final int index = i;
-            correctCheckBoxes[i].addActionListener(e -> handleCheckboxChange(index));
-        }
-    }
-
-    /** Returns true if the question or any answer has non-blank text. */
-    public boolean hasAnyContent() {
-        if (textAreaQuestion.getText() != null && !textAreaQuestion.getText().isBlank()) return true;
-        for (JTextArea area : answerAreas) {
-            if (area.getText() != null && !area.getText().isBlank()) return true;
-        }
-        return false;
-    }
-
-    /** Returns true if exactly one answer checkbox is selected. */
-    public boolean hasCorrectAnswerSelected() {
-        for (JCheckBox cb : correctCheckBoxes) {
-            if (cb.isSelected()) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Explicitly flush all text-field values to the model.
-     * Call this before navigating away so the data is saved even when
-     * focusLost does not fire (e.g. CardLayout panel switch).
-     */
-    public void saveAll() {
-        if (questionModel == null) return;
-        questionModel.setQuestion(textAreaQuestion.getText());
-        for (int i = 0; i < ANSWER_COUNT; i++) {
-            questionModel.setAnswer(i, answerAreas[i].getText());
-        }
-    }
-
-    private void populateFromModel() {
-        if (questionModel == null) return;
-        String qText = questionModel.getQuestion();
-        if (qText != null) textAreaQuestion.setText(qText);
-        java.util.List<String> answers = questionModel.getAnswers();
-        if (answers == null) return;
-        for (int i = 0; i < ANSWER_COUNT && i < answers.size(); i++) {
-            String a = answers.get(i);
-            if (a != null) answerAreas[i].setText(a);
+            final int idx = i;
+            correctCheckBoxes[i].addActionListener(e -> handleCheckboxChange(idx));
         }
     }
 
@@ -216,17 +230,39 @@ public class QuestionPanel extends JPanel {
         suppressCheckboxEvents = false;
     }
 
-    private static void enforceTwoRowViewport(JTextArea area, JScrollPane scroll) {
-        if (area == null || scroll == null) return;
-        int rows = Math.max(TEXT_ROWS, area.getRows());
-        area.setRows(rows);
-        FontMetrics fm = area.getFontMetrics(area.getFont());
-        int lineH = (fm != null) ? fm.getHeight() : Math.max(12, area.getPreferredSize().height);
-        Insets in = area.getInsets();
-        int contentH = (lineH * rows) + (in != null ? in.top + in.bottom : 0);
-        area.setMinimumSize(new Dimension(100, contentH));
-        Dimension spPref = new Dimension(200, contentH + 4);
-        scroll.setMinimumSize(spPref);
-        scroll.setPreferredSize(spPref);
+    private void populateFromModel() {
+        if (questionModel == null) return;
+        String qText = questionModel.getQuestion();
+        if (qText != null) textAreaQuestion.setText(qText);
+        java.util.List<String> answers = questionModel.getAnswers();
+        if (answers == null) return;
+        for (int i = 0; i < ANSWER_COUNT && i < answers.size(); i++) {
+            String a = answers.get(i);
+            if (a != null) answerAreas[i].setText(a);
+        }
+    }
+
+    // ── Public helpers ────────────────────────────────────────────────────────
+    public boolean hasAnyContent() {
+        if (textAreaQuestion.getText() != null && !textAreaQuestion.getText().isBlank()) return true;
+        for (JTextArea area : answerAreas) {
+            if (area.getText() != null && !area.getText().isBlank()) return true;
+        }
+        return false;
+    }
+
+    public boolean hasCorrectAnswerSelected() {
+        for (JCheckBox cb : correctCheckBoxes) {
+            if (cb.isSelected()) return true;
+        }
+        return false;
+    }
+
+    public void saveAll() {
+        if (questionModel == null) return;
+        questionModel.setQuestion(textAreaQuestion.getText());
+        for (int i = 0; i < ANSWER_COUNT; i++) {
+            questionModel.setAnswer(i, answerAreas[i].getText());
+        }
     }
 }

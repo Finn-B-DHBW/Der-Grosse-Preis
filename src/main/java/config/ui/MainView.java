@@ -17,7 +17,7 @@ public class MainView extends JFrame {
         panelNames = new HashMap<>();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1100, 700);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 

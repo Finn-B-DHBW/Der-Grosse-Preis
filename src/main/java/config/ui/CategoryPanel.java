@@ -4,41 +4,68 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CategoryPanel extends JPanel {
-    private final JLabel titleLabel = new JLabel("Kategorie");
-    private final JButton buttonDone = new JButton("fertig");
-    private final JPanel questionsContainer = new JPanel();
 
-    public JButton getButtonDone() { return buttonDone; }
-    public JPanel getQuestionsContainer() { return questionsContainer; }
+    private final JLabel  titleLabel         = new JLabel("Kategorie");
+    private final JButton buttonSave         = new JButton("Speichern");
+    private final JButton buttonCancel       = new JButton("Abbrechen");
+    private final JPanel  questionsContainer = new JPanel();
+
+    private static final float FONT_TITLE  = 15f;
+    private static final float FONT_NORMAL = 13f;
+    private static final Color HDR_BG      = new Color(244, 244, 244);
+    private static final Color BORDER_CLR  = new Color(210, 210, 210);
+
+    public JButton getButtonSave()         { return buttonSave; }
+    public JButton getButtonCancel()       { return buttonCancel; }
+    public JPanel  getQuestionsContainer() { return questionsContainer; }
 
     public CategoryPanel() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
 
-        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
-        header.add(titleLabel);
-        add(header, BorderLayout.NORTH);
+        add(buildHeader(),    BorderLayout.NORTH);
+        add(buildContent(),   BorderLayout.CENTER);
+        add(buildFooter(),    BorderLayout.SOUTH);
+    }
 
+    private JPanel buildHeader() {
+        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, FONT_TITLE));
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(HDR_BG);
+        panel.setOpaque(true);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_CLR),
+                BorderFactory.createEmptyBorder(10, 16, 10, 16)));
+        panel.add(titleLabel, BorderLayout.WEST);
+        return panel;
+    }
+
+    private JScrollPane buildContent() {
         questionsContainer.setLayout(new BoxLayout(questionsContainer, BoxLayout.Y_AXIS));
-        questionsContainer.setBorder(BorderFactory.createLineBorder(Color.GREEN, 1));
-        JScrollPane questionsScroll = new JScrollPane(questionsContainer,
+
+        JScrollPane scroll = new JScrollPane(questionsContainer,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        questionsScroll.getVerticalScrollBar().setUnitIncrement(16);
-        add(questionsScroll, BorderLayout.CENTER);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setBorder(null);
+        return scroll;
+    }
 
-        JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        footer.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
-                BorderFactory.createEmptyBorder(8, 0, 0, 0)
-        ));
-        footer.add(buttonDone);
-        add(footer, BorderLayout.SOUTH);
+    private JPanel buildFooter() {
+        for (JButton btn : new JButton[]{buttonSave, buttonCancel}) {
+            btn.setFont(btn.getFont().deriveFont(Font.PLAIN, FONT_NORMAL));
+            btn.setFocusPainted(false);
+            btn.setPreferredSize(new Dimension(120, 36));
+        }
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
+        panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER_CLR));
+        panel.add(buttonSave);
+        panel.add(buttonCancel);
+        return panel;
     }
 
     public void setCategoryName(String name) {
-        String title = (name != null && !name.isBlank()) ? "Kategorie: " + name : "Kategorie";
-        titleLabel.setText(title);
+        titleLabel.setText((name != null && !name.isBlank()) ? "Kategorie: " + name : "Kategorie");
         revalidate();
         repaint();
     }
