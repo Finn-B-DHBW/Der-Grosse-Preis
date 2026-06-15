@@ -151,7 +151,8 @@ public class QuestionScreen {
     private JButton[] setUpAnswerButtons(JPanel grid, Question question) {
         List<String> answers = new ArrayList<>();
         if (question.getWrongAnswers() != null) {
-            answers.addAll(Arrays.asList(question.getWrongAnswers()));
+            List<String> wrong = Arrays.asList(question.getWrongAnswers());
+            answers.addAll(wrong.subList(0, Math.min(3, wrong.size())));
         }
         answers.add(question.getRightAnswer());
         Collections.shuffle(answers);
