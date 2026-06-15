@@ -224,7 +224,12 @@ public class QuestionScreen {
                 pressedOnce.set(true);
             } else {
                 switchPlayer(gameManager);
-                gameManager.getMainScreen().showMainScreen(gameManager);
+                List<Question> all = gameManager.getQuestionList();
+                if (all != null && gameManager.getAnsweredQuestionList().size() >= all.size()) {
+                    gameManager.getEndScreen().showEndScreen(gameManager);
+                } else {
+                    gameManager.getMainScreen().showMainScreen(gameManager);
+                }
             }
         });
         return btn;
