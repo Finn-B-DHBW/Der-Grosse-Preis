@@ -2,6 +2,9 @@ package config.ui;
 
 import config.ConfiguratorOverview;
 import com.formdev.flatlaf.FlatLightLaf;
+import javax.swing.UIManager;
+import java.awt.Color;
+import java.awt.Insets;
 
 public class MainController {
     private MainView mainView;
@@ -42,6 +45,19 @@ public class MainController {
     private static void setNimbusLookAndFeel() {
         try {
             FlatLightLaf.setup();
+            // Rounded corners for all interactive components
+            UIManager.put("Button.arc",          12);
+            UIManager.put("Component.arc",        8);
+            UIManager.put("TextComponent.arc",    8);
+            UIManager.put("ScrollBar.thumbArc", 999);
+            UIManager.put("ScrollBar.thumbInsets", new Insets(2, 2, 2, 2));
+            // Slightly larger checkbox icons
+            UIManager.put("CheckBox.icon.width",  18);
+            UIManager.put("CheckBox.icon.height", 18);
+            // Remove the default FlatLaf gray background — use white everywhere
+            UIManager.put("Panel.background",      Color.WHITE);
+            UIManager.put("ScrollPane.background", Color.WHITE);
+            UIManager.put("Viewport.background",   Color.WHITE);
         } catch (Exception ex) {
             // keep default LookAndFeel if FlatLaf is not available
         }

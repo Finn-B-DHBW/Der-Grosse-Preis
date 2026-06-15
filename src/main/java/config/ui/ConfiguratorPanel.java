@@ -3,7 +3,6 @@ package config.ui;
 import config.model.Configuration;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,11 +22,16 @@ public class ConfiguratorPanel extends JPanel {
     private final List<JButton>         configButtons    = new ArrayList<>();
     private final Map<JButton, Integer> buttonToConfigId = new LinkedHashMap<>();
 
-    // ── Selection borders ─────────────────────────────────────────────────────
-    private static final Border SELECTED_BORDER =
-            BorderFactory.createLineBorder(new Color(0, 120, 215), 2);
-    private static final Border DEFAULT_BORDER =
-            BorderFactory.createLineBorder(new Color(180, 180, 180), 1);
+    // ── Colors ───────────────────────────────────────────────────────────────
+    static final Color PRIMARY      = new Color(59, 130, 246);   // blue-500
+    static final Color DANGER       = new Color(239, 68,  68);   // red-500
+    static final Color SURFACE      = new Color(248, 250, 252);  // slate-50
+    static final Color BORDER_CLR   = new Color(226, 232, 240);  // slate-200
+    static final Color TEXT_DARK    = new Color(15,  23,  42);   // slate-900
+
+    // ── Selection colors (border-free) ───────────────────────────────────────
+    private static final Color SEL_BG     = new Color(59, 130, 246);    // blue-500 — selected (stark)
+    private static final Color DEFAULT_BG = new Color(191, 219, 254);   // blue-200 — default
 
     // ── Sizing constants ──────────────────────────────────────────────────────
     private static final int   CONFIG_BTN_HEIGHT = 52;
@@ -36,6 +40,8 @@ public class ConfiguratorPanel extends JPanel {
     private static final int   ACTION_GAP        = 10;
     private static final float FONT_NORMAL       = 16f;
     private static final float FONT_HEADER_BTN   = 17f;
+    private static final float FONT_SECTION_HDR  = 20f;
+    private static final Color HEADER_BG         = new Color(219, 234, 254);  // blue-100
 
     // ── Public API ────────────────────────────────────────────────────────────
     public JButton getButtonCreate()              { return buttonCreate; }
@@ -47,7 +53,7 @@ public class ConfiguratorPanel extends JPanel {
     // ── Constructor ───────────────────────────────────────────────────────────
     public ConfiguratorPanel() {
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // No outer margin — the three colored sections fill edge-to-edge
 
         add(buildHeader(), BorderLayout.NORTH);
         add(buildCenter(), BorderLayout.CENTER);
@@ -56,15 +62,20 @@ public class ConfiguratorPanel extends JPanel {
     }
 
     // ── Header ────────────────────────────────────────────────────────────────
-    // Full-width "Neue Konfiguration erstellen" button, bold, slightly taller
+    // Colored header band (blue-800) with the create-button floating inside
     private JPanel buildHeader() {
         buttonCreate = new JButton("+ Neues Spiel erstellen");
         buttonCreate.setFont(buttonCreate.getFont().deriveFont(Font.BOLD, FONT_HEADER_BTN));
         buttonCreate.setFocusPainted(false);
         buttonCreate.setPreferredSize(new Dimension(0, 50));
+        buttonCreate.setBackground(new Color(96, 165, 250));  // blue-400 — softer than blue-500
+        buttonCreate.setForeground(Color.WHITE);
+        buttonCreate.setBorderPainted(false);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 18, 0));
+        panel.setBackground(HEADER_BG);
+        panel.setOpaque(true);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
         panel.add(buttonCreate, BorderLayout.CENTER);
         return panel;
     }
@@ -72,65 +83,67 @@ public class ConfiguratorPanel extends JPanel {
     // ── Center ────────────────────────────────────────────────────────────────
     // Two columns: scrollable config list (CENTER) + action buttons (EAST)
     private JPanel buildCenter() {
-        JPanel panel = new JPanel(new BorderLayout(16, 0));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.add(buildConfigList(),   BorderLayout.CENTER);
         panel.add(buildActionColumn(), BorderLayout.EAST);
         return panel;
     }
 
-    // Left column ─ scrollable list of saved configurations
+    // Left section ─ fills full height, slate-50 background
     private JPanel buildConfigList() {
         JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.setBackground(SURFACE);   // slate-50
+        panel.setOpaque(true);
+        panel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 
         JLabel header = new JLabel("Spiele");
-        header.setFont(header.getFont().deriveFont(Font.BOLD, FONT_NORMAL));
+        header.setFont(header.getFont().deriveFont(Font.BOLD, FONT_SECTION_HDR));
+        header.setForeground(TEXT_DARK);
         panel.add(header, BorderLayout.NORTH);
 
         panelConfigurationButtons.setLayout(
                 new BoxLayout(panelConfigurationButtons, BoxLayout.Y_AXIS));
+        panelConfigurationButtons.setBackground(SURFACE);
+        panelConfigurationButtons.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
 
-        // Scroll-pane wrapper (NORTH trick keeps buttons packed at top)
         JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(SURFACE);
         wrapper.add(panelConfigurationButtons, BorderLayout.NORTH);
+
         JScrollPane scroll = new JScrollPane(wrapper,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
-        scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+        scroll.setBorder(null);
+        scroll.getViewport().setBackground(SURFACE);
         panel.add(scroll, BorderLayout.CENTER);
 
         return panel;
     }
 
-    // Right column ─ Bearbeiten / Duplizieren / Löschen (always same size)
+    // Right section ─ fills full height, blue-50 background
     private JPanel buildActionColumn() {
         buttonEdit      = makeActionButton("Bearbeiten");
         buttonDuplicate = makeActionButton("Duplizieren");
         buttonDelete    = makeActionButton("Löschen");
+        buttonDelete.setBackground(DANGER);
+        buttonDelete.setForeground(Color.WHITE);
 
-        // GridLayout: all three cells always identical in size
         JPanel grid = new JPanel(new GridLayout(3, 1, 0, ACTION_GAP));
+        grid.setOpaque(false);
         grid.add(buttonEdit);
         grid.add(buttonDuplicate);
         grid.add(buttonDelete);
-        grid.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Invisible spacer matching the "Spiele" header label height + gap on the left
-        JLabel spacer = new JLabel(" ");
-        spacer.setFont(spacer.getFont().deriveFont(Font.BOLD, FONT_NORMAL));
-        spacer.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JPanel inner = new JPanel();
-        inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-        inner.add(spacer);
-        inner.add(Box.createRigidArea(new Dimension(0, 8)));
-        inner.add(grid);
-        inner.add(Box.createVerticalGlue());
-
-        // Fixed-width outer wrapper so the column doesn't shrink/grow
+        // Full-height colored section — buttons sit at top with padding
         JPanel outer = new JPanel(new BorderLayout());
-        outer.setPreferredSize(new Dimension(ACTION_BTN_WIDTH, 0));
-        outer.add(inner, BorderLayout.NORTH);
+        outer.setBackground(new Color(239, 246, 255));  // blue-50
+        outer.setOpaque(true);
+        outer.setPreferredSize(new Dimension(ACTION_BTN_WIDTH + 32, 0));
+        outer.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 1, 0, 0, BORDER_CLR),
+                BorderFactory.createEmptyBorder(16, 16, 16, 16)));
+        outer.add(grid, BorderLayout.NORTH);
         return outer;
     }
 
@@ -138,6 +151,7 @@ public class ConfiguratorPanel extends JPanel {
         JButton btn = new JButton(text);
         btn.setFont(btn.getFont().deriveFont(Font.PLAIN, FONT_NORMAL));
         btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
         btn.setPreferredSize(new Dimension(ACTION_BTN_WIDTH, ACTION_BTN_HEIGHT));
         return btn;
     }
@@ -158,9 +172,12 @@ public class ConfiguratorPanel extends JPanel {
                         : cfg.getTitle();
 
                 JButton btn = new JButton(label);
-                btn.setFont(btn.getFont().deriveFont(Font.PLAIN, FONT_NORMAL));
-                btn.setBorder(DEFAULT_BORDER);
+                btn.setFont(btn.getFont().deriveFont(Font.BOLD, FONT_NORMAL));
+                btn.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 12));
+                btn.setBorderPainted(false);
                 btn.setFocusPainted(false);
+                btn.setBackground(DEFAULT_BG);
+                btn.setForeground(TEXT_DARK);
                 btn.setAlignmentX(Component.LEFT_ALIGNMENT);
                 btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, CONFIG_BTN_HEIGHT));
                 btn.setPreferredSize(new Dimension(100, CONFIG_BTN_HEIGHT));  // min width; grows with panel
@@ -185,7 +202,8 @@ public class ConfiguratorPanel extends JPanel {
         for (JButton btn : configButtons) {
             Integer id = buttonToConfigId.get(btn);
             boolean sel = selectedConfigId != null && selectedConfigId.equals(id);
-            btn.setBorder(sel ? SELECTED_BORDER : DEFAULT_BORDER);
+            btn.setBackground(sel ? SEL_BG : DEFAULT_BG);
+            btn.setForeground(sel ? Color.WHITE : TEXT_DARK);
         }
     }
 

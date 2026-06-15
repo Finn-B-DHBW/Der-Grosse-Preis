@@ -16,9 +16,9 @@ public class QuestionPanel extends JPanel {
     private static final float FONT_HEADER   = 15f;   // "X Punkte" block header
     private static final float FONT_LABEL    = 18f;   // row labels (?, a), b), c), "richtig?")
     private static final float FONT_AREA     = 14f;   // text area content
-    private static final Color HDR_BG        = new Color(237, 242, 250);
-    private static final Color HDR_BORDER    = new Color(200, 215, 240);
-    private static final Color HDR_FG        = new Color(30, 60, 120);
+    private static final Color HDR_BG        = new Color(219, 234, 254);  // blue-200
+    private static final Color HDR_BORDER    = new Color(147, 197, 253);  // blue-300
+    private static final Color HDR_FG        = new Color(29,  78,  216);  // blue-700
 
     // Labels for answer rows: a), b), c)
     private static final String[] ANSWER_LABELS = {"a)", "b)", "c)"};

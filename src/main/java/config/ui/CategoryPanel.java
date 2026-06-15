@@ -12,8 +12,10 @@ public class CategoryPanel extends JPanel {
 
     private static final float FONT_TITLE  = 15f;
     private static final float FONT_NORMAL = 13f;
-    private static final Color HDR_BG      = new Color(244, 244, 244);
-    private static final Color BORDER_CLR  = new Color(210, 210, 210);
+    private static final Color HDR_BG      = new Color(239, 246, 255);  // blue-50
+    private static final Color HDR_BORDER  = new Color(191, 219, 254);  // blue-200
+    private static final Color HDR_FG      = new Color(29,  78,  216);  // blue-700
+    private static final Color BORDER_CLR  = new Color(226, 232, 240);  // slate-200
 
     public JButton getButtonSave()         { return buttonSave; }
     public JButton getButtonCancel()       { return buttonCancel; }
@@ -29,12 +31,13 @@ public class CategoryPanel extends JPanel {
 
     private JPanel buildHeader() {
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, FONT_TITLE));
+        titleLabel.setForeground(HDR_FG);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(HDR_BG);
         panel.setOpaque(true);
         panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_CLR),
+                BorderFactory.createMatteBorder(0, 0, 1, 0, HDR_BORDER),
                 BorderFactory.createEmptyBorder(10, 16, 10, 16)));
         panel.add(titleLabel, BorderLayout.WEST);
         return panel;
@@ -57,6 +60,10 @@ public class CategoryPanel extends JPanel {
             btn.setFocusPainted(false);
             btn.setPreferredSize(new Dimension(120, 36));
         }
+        buttonSave.setBackground(new Color(59, 130, 246));
+        buttonSave.setForeground(Color.WHITE);
+        buttonCancel.setForeground(new Color(100, 116, 139));
+
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
         panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER_CLR));
         panel.add(buttonSave);

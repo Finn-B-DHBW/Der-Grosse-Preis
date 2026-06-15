@@ -5,13 +5,17 @@ import config.model.ConfigQuestion;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Map;
 
 public class CategoryExpandablePanel extends JPanel {
 
-    private static final Color HDR_BG     = new Color(244, 244, 244);
-    private static final Color BORDER_CLR = new Color(210, 210, 210);
-    private static final Color ROW_SEP    = new Color(232, 232, 232);
+    private static final Color HDR_BG     = Color.WHITE;
+    private static final Color BORDER_CLR = new Color(226, 232, 240);  // slate-200
+    private static final Color ROW_SEP    = new Color(241, 245, 249);  // slate-100
+    private static final Color ACCENT     = new Color(59,  130, 246);  // blue-500
+    private static final Color DANGER_CLR = new Color(239, 68,  68);   // red-500
     private static final float    FONT_NAME      = 14f;
     private static final float    FONT_Q         = 17f;
     private static final float    FONT_A         = 16f;
@@ -35,47 +39,63 @@ public class CategoryExpandablePanel extends JPanel {
     public CategoryExpandablePanel(Category category) {
         this.categoryModel = category;
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_CLR),
-                BorderFactory.createEmptyBorder(0, 0, 2, 0)));
+        setOpaque(false);
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 14, 0));
 
         // ── Header ────────────────────────────────────────────────────────
         header = new JPanel(new BorderLayout());
         header.setBackground(HDR_BG);
         header.setOpaque(true);
-        header.setBorder(BorderFactory.createEmptyBorder(7, 8, 7, 8));
+        // Left blue accent stripe
+        header.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 4, 0, 0, ACCENT),
+                BorderFactory.createEmptyBorder(7, 8, 7, 8)));
 
-        // Toggle button — minimal styling
+        // Toggle glyph — looks like a label, no button chrome
         toggleButton.setFont(toggleButton.getFont().deriveFont(Font.PLAIN, FONT_NAME));
+        toggleButton.setContentAreaFilled(false);
+        toggleButton.setBorderPainted(false);
         toggleButton.setFocusPainted(false);
-        toggleButton.setMargin(new Insets(2, 6, 2, 6));
+        toggleButton.setMargin(new Insets(0, 2, 0, 2));
 
         // Category name
         nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD, FONT_NAME));
+        nameLabel.setForeground(new Color(15, 23, 42));
         nameLabel.setText(category != null && category.getName() != null
                 && !category.getName().isBlank() ? category.getName() : "Kategorie");
 
-        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        // nameLabel in CENTER of left fills all available width → no truncation
+        // Clicking anywhere on the left panel (glyph or name) expands/collapses
+        JPanel left = new JPanel(new BorderLayout(8, 0));
         left.setOpaque(false);
-        left.add(toggleButton);
-        left.add(nameLabel);
-        header.add(left, BorderLayout.WEST);
+        left.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        left.add(toggleButton, BorderLayout.WEST);
+        left.add(nameLabel,    BorderLayout.CENTER);
+        MouseAdapter expandClick = new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) { toggle(); }
+        };
+        left.addMouseListener(expandClick);
+        nameLabel.addMouseListener(expandClick);
+        header.add(left, BorderLayout.CENTER);
 
         // Bearbeiten + Löschen buttons
         editButton.setFont(editButton.getFont().deriveFont(Font.PLAIN, FONT_NAME));
         editButton.setFocusPainted(false);
+        editButton.setBorderPainted(false);
+        editButton.setBackground(new Color(219, 234, 254));  // blue-100
+        editButton.setForeground(ACCENT);
+        editButton.setPreferredSize(new Dimension(102, 30));  // fixed — prevents truncation on DPI change
         deleteButton.setFont(deleteButton.getFont().deriveFont(Font.PLAIN, FONT_NAME));
         deleteButton.setFocusPainted(false);
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
+        deleteButton.setBorderPainted(false);
+        deleteButton.setBackground(new Color(226, 232, 240));  // slate-200
+        deleteButton.setForeground(DANGER_CLR);
+        deleteButton.setPreferredSize(new Dimension(90, 30));  // fixed — prevents truncation on DPI change
+        JPanel right = new JPanel(new GridLayout(1, 2, 6, 0));
         right.setOpaque(false);
         right.add(editButton);
         right.add(deleteButton);
         header.add(right, BorderLayout.EAST);
-
-        // Center spacer — ensures EAST always gets its preferred width
-        JPanel spacer = new JPanel();
-        spacer.setOpaque(false);
-        header.add(spacer, BorderLayout.CENTER);
 
         add(header, BorderLayout.NORTH);
 
