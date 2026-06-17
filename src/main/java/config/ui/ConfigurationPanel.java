@@ -26,7 +26,8 @@ public class ConfigurationPanel extends JPanel {
     private static final float FONT_TITLE   = 18f;
     private static final int   BTN_HEIGHT   = 36;
     private static final Color BORDER_CLR   = new Color(226, 232, 240);  // slate-200
-    private static final Color HDR_BG       = new Color(191, 219, 254);  // blue-200
+    private static final Color HDR_BG       = new Color(191, 219, 254);  // blue-200 — header bar
+    private static final Color SIDEBAR_BG   = new Color(239, 246, 255);  // blue-50  — left sidebar
     private static final Color HDR_BORDER   = new Color(147, 197, 253);  // blue-300
     private static final Color HDR_FG       = new Color(30,   64, 175);  // blue-800
 
@@ -91,7 +92,7 @@ public class ConfigurationPanel extends JPanel {
     private JPanel buildCenter() {
         // Left blue sidebar — same blue-50 as the header, spans full height
         JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.setBackground(HDR_BG);
+        sidebar.setBackground(SIDEBAR_BG);
         sidebar.setOpaque(true);
         sidebar.setPreferredSize(new Dimension(320, 0));
         sidebar.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -128,7 +129,7 @@ public class ConfigurationPanel extends JPanel {
         panel.add(l2);
         panel.add(Box.createRigidArea(new Dimension(0, 4)));
         JPanel spinnerWrap = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        spinnerWrap.setBackground(HDR_BG);
+        spinnerWrap.setBackground(SIDEBAR_BG);
         spinnerWrap.setAlignmentX(Component.LEFT_ALIGNMENT);
         spinnerWrap.add(spinnerNumberOfQuestions);
         panel.add(spinnerWrap);
@@ -151,7 +152,7 @@ public class ConfigurationPanel extends JPanel {
         styleButton(buttonAddCategory);
         styleButton(buttonAutoGenerate);
         JPanel buttonRow = new JPanel(new GridLayout(1, 2, 6, 0));
-        buttonRow.setBackground(HDR_BG);
+        buttonRow.setBackground(SIDEBAR_BG);
         buttonRow.setAlignmentX(Component.LEFT_ALIGNMENT);
         buttonRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, BTN_HEIGHT));
         buttonRow.add(buttonAddCategory);
@@ -236,6 +237,8 @@ public class ConfigurationPanel extends JPanel {
         textFieldNumberOfQuestions = editor.getTextField();
         textFieldNumberOfQuestions.setColumns(6);
         textFieldNumberOfQuestions.setFont(textFieldNumberOfQuestions.getFont().deriveFont(FONT_LABEL));
+        spinnerNumberOfQuestions.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+        textFieldNumberOfQuestions.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
         javax.swing.JFormattedTextField.AbstractFormatter fmt =
                 textFieldNumberOfQuestions.getFormatter();

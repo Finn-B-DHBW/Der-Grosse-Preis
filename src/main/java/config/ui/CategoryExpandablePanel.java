@@ -88,7 +88,7 @@ public class CategoryExpandablePanel extends JPanel {
         deleteButton.setFont(deleteButton.getFont().deriveFont(Font.PLAIN, FONT_NAME));
         deleteButton.setFocusPainted(false);
         deleteButton.setBorderPainted(false);
-        deleteButton.setBackground(new Color(226, 232, 240));  // slate-200
+        deleteButton.setBackground(new Color(241, 245, 249));  // slate-100
         deleteButton.setForeground(DANGER_CLR);
         deleteButton.setPreferredSize(new Dimension(90, 30));  // fixed — prevents truncation on DPI change
         JPanel right = new JPanel(new GridLayout(1, 2, 6, 0));
